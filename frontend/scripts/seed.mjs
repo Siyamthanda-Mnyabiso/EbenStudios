@@ -42,7 +42,7 @@ async function seedProducts() {
     const description = "Placeholder product. Replace the name, price and photo in the admin.";
     const products = [
         { name: "White tee", description, price: 549, stock: 10, tag: "Placeholder" },
-        { name: "Red pants", description, price: 799, stock: 10, tag: "Placeholder" },
+        { name: "Red shorts", description, price: 799, stock: 10, tag: "Placeholder" },
         { name: "Cap", description, price: 399, stock: 10, tag: "Placeholder" },
     ];
 
