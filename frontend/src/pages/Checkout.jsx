@@ -6,6 +6,7 @@ import { createOrder } from "../service/orderService";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 import PageHeader from "../components/ui/PageHeader";
+import { describeOptions } from "../lib/productOptions";
 
 export default function Checkout() {
     const { user, loading: authLoading } = useAuth();
@@ -43,7 +44,12 @@ export default function Checkout() {
 
         try {
             const order = await createOrder({
-                items: items.map((item) => ({ productId: item.id, quantity: item.quantity })),
+                items: items.map((item) => ({
+                    productId: item.id,
+                    quantity: item.quantity,
+                    size: item.size,
+                    color: item.color,
+                })),
                 shippingAddress: `${address}, ${city}, ${postalCode}`,
             });
 
@@ -85,8 +91,11 @@ export default function Checkout() {
 
                     <ul className="flex flex-col gap-3 mb-6">
                         {items.map((item) => (
-                            <li key={item.id} className="flex items-baseline justify-between gap-4">
-                                <span className="text-ink-soft">{item.name} x {item.quantity}</span>
+                            <li key={item.key} className="flex items-baseline justify-between gap-4">
+                                <span className="text-ink-soft">
+                                    {item.name} x {item.quantity}
+                                    {describeOptions(item) && <span className="block text-sm">{describeOptions(item)}</span>}
+                                </span>
                                 <span className="font-bold">R {Number(item.price * item.quantity).toLocaleString()}</span>
                             </li>
                         ))}

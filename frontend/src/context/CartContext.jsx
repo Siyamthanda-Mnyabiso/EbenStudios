@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import CartContext from "./cart-context";
+import { lineKey } from "../lib/productOptions";
 
 const STORAGE_KEY = "eben_cart_items";
 
@@ -7,7 +8,10 @@ export function CartProvider({ children }) {
     const [items, setItems] = useState(() => {
         try {
             const stored = localStorage.getItem(STORAGE_KEY);
-            return stored ? JSON.parse(stored) : [];
+            // Carts saved before sizes and colours existed get a key on load.
+            return stored
+                ? JSON.parse(stored).map((item) => ({ ...item, key: item.key ?? lineKey(item.id, item.size, item.color) }))
+                : [];
         } catch {
             return [];
         }
@@ -17,45 +21,46 @@ export function CartProvider({ children }) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
     }, [items]);
 
-    function addToCart(product, quantity = 1) {
+    function addToCart(product, { quantity = 1, size = null, color = null } = {}) {
+        const key = lineKey(product.id, size, color);
+
         setItems((current) => {
-            const existing = current.find((item) => item.id === product.id);
+            const existing = current.find((item) => item.key === key);
 
             if (existing) {
                 return current.map((item) =>
-                    item.id === product.id
-                        ? { ...item, quantity: item.quantity + quantity }
-                        : item
+                    item.key === key ? { ...item, quantity: item.quantity + quantity } : item
                 );
             }
 
             return [
                 ...current,
                 {
+                    key,
                     id: product.id,
                     name: product.name,
                     price: product.price,
                     tag: product.tag,
                     imageUrl: product.imageUrl,
+                    size,
+                    color,
                     quantity,
                 },
             ];
         });
     }
 
-    function updateQuantity(id, quantity) {
+    function updateQuantity(key, quantity) {
         if (quantity <= 0) {
-            removeFromCart(id);
+            removeFromCart(key);
             return;
         }
 
-        setItems((current) =>
-            current.map((item) => (item.id === id ? { ...item, quantity } : item))
-        );
+        setItems((current) => current.map((item) => (item.key === key ? { ...item, quantity } : item)));
     }
 
-    function removeFromCart(id) {
-        setItems((current) => current.filter((item) => item.id !== id));
+    function removeFromCart(key) {
+        setItems((current) => current.filter((item) => item.key !== key));
     }
 
     function clearCart() {

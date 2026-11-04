@@ -4,6 +4,7 @@ import { useAuth } from "../hooks/useAuth";
 import { getMyOrders } from "../service/orderService";
 import Button from "../components/ui/Button";
 import PageHeader from "../components/ui/PageHeader";
+import { describeOptions } from "../lib/productOptions";
 
 export default function Orders() {
     const { user, loading: authLoading } = useAuth();
@@ -68,7 +69,10 @@ export default function Orders() {
                             <ul className="lg:col-span-6 flex flex-col gap-2">
                                 {order.items.map((item) => (
                                     <li key={item.id} className="flex justify-between gap-4">
-                                        <span>{item.product?.name} x {item.quantity}</span>
+                                        <span>
+                                            {item.product?.name} x {item.quantity}
+                                            {describeOptions(item) && <span className="block text-sm text-ink-soft">{describeOptions(item)}</span>}
+                                        </span>
                                         <span className="text-ink-soft">R {Number(item.price * item.quantity).toLocaleString()}</span>
                                     </li>
                                 ))}
