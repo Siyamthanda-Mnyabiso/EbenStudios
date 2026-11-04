@@ -1,10 +1,12 @@
 import { Outlet } from "react-router-dom";
+import AnnouncementBar from "./AnnouncementBar";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 
 export default function MainLayout() {
     return (
-        <div className="min-h-screen flex flex-col bg-[#f5f5f3] text-black">
+        <div className="min-h-screen flex flex-col">
+            <AnnouncementBar />
             <Navbar />
 
             <main className="flex-1">

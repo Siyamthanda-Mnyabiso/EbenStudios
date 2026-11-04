@@ -8,62 +8,55 @@ const links = [
     { to: "/admin/orders", label: "Orders", icon: ClipboardList },
 ];
 
+const itemBase = "flex items-center gap-3 px-4 min-h-12 font-medium transition-colors";
+
 function linkClass({ isActive }) {
-    return `flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition ${
-        isActive
-            ? "bg-white text-black"
-            : "text-neutral-400 hover:bg-white/10 hover:text-white"
-    }`;
+    return `${itemBase} ${isActive ? "bg-paper text-ink" : "text-paper/75 hover:bg-paper/10 hover:text-paper"}`;
 }
 
 export default function AdminLayout() {
     const { user, logout } = useAuth();
 
     return (
-        <div className="min-h-screen flex bg-[#f5f5f3] text-black">
-            {/* SIDEBAR */}
-            <aside className="w-64 shrink-0 bg-black text-white flex flex-col p-6">
-                <Link to="/admin" className="text-xl font-black uppercase tracking-tight mb-10">
-                    Eben Admin
+        <div className="min-h-screen flex flex-col md:flex-row">
+            <aside className="md:w-64 shrink-0 bg-ink text-paper flex flex-col p-4 md:p-6 gap-4 md:gap-0">
+                <Link to="/admin" className="font-display text-2xl font-bold tracking-tight md:mb-10">
+                    Eben admin
                 </Link>
 
-                <nav className="flex-1 flex flex-col gap-2">
+                <nav aria-label="Admin" className="md:flex-1 flex md:flex-col gap-1 overflow-x-auto">
                     {links.map(({ to, label, icon: Icon, end }) => (
                         <NavLink key={to} to={to} end={end} className={linkClass}>
-                            <Icon size={18} />
+                            <Icon size={18} aria-hidden="true" />
                             {label}
                         </NavLink>
                     ))}
                 </nav>
 
-                <div className="border-t border-white/10 pt-4 flex flex-col gap-2">
-                    <Link
-                        to="/"
-                        className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-neutral-400 hover:bg-white/10 hover:text-white transition"
-                    >
-                        <Store size={18} />
-                        View Store
+                <div className="md:border-t border-paper/20 md:pt-4 flex md:flex-col gap-1">
+                    <Link to="/" className={`${itemBase} text-paper/75 hover:bg-paper/10 hover:text-paper`}>
+                        <Store size={18} aria-hidden="true" />
+                        View store
                     </Link>
 
                     <button
                         onClick={logout}
-                        className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-neutral-400 hover:bg-white/10 hover:text-white transition text-left"
+                        className={`${itemBase} text-paper/75 hover:bg-paper/10 hover:text-paper text-left`}
                     >
-                        <LogOut size={18} />
-                        Log Out
+                        <LogOut size={18} aria-hidden="true" />
+                        Log out
                     </button>
                 </div>
             </aside>
 
-            {/* MAIN */}
-            <div className="flex-1 flex flex-col">
-                <header className="h-20 flex items-center justify-end px-8 border-b border-black/10 bg-white">
-                    <p className="text-sm text-neutral-500">
-                        Signed in as <span className="font-semibold text-black">{user?.email}</span>
+            <div className="flex-1 flex flex-col min-w-0">
+                <header className="h-16 flex items-center justify-end px-6 md:px-8 border-b border-line bg-white">
+                    <p className="text-mute">
+                        Signed in as <span className="font-bold text-ink">{user?.email}</span>
                     </p>
                 </header>
 
-                <main className="flex-1 p-8">
+                <main className="flex-1 p-6 md:p-8">
                     <Outlet />
                 </main>
             </div>

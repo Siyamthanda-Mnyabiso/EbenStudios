@@ -1,40 +1,51 @@
 import { useEffect, useState } from "react";
 import AuthContext from "./auth-context";
-import { login as apiLogin, register as apiRegister, getCurrentUser } from "../service/authService";
-
-const TOKEN_KEY = "eben_auth_token";
+import { supabase } from "../service/supabase";
+import {
+    login as apiLogin,
+    register as apiRegister,
+    logout as apiLogout,
+    getCurrentUser,
+    getProfile,
+} from "../service/authService";
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(() => Boolean(localStorage.getItem(TOKEN_KEY)));
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (!localStorage.getItem(TOKEN_KEY)) {
-            return;
-        }
-
         getCurrentUser()
             .then(setUser)
-            .catch(() => localStorage.removeItem(TOKEN_KEY))
+            .catch(() => setUser(null))
             .finally(() => setLoading(false));
+
+        // Keeps tabs in sync and clears the user when the session expires.
+        const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+            if (event === "SIGNED_OUT" || !session) {
+                setUser(null);
+            } else if (event === "TOKEN_REFRESHED" || event === "USER_UPDATED") {
+                // Deferred: awaiting Supabase calls inside this callback can deadlock the auth client.
+                setTimeout(() => getProfile(session.user.id).then(setUser).catch(() => {}), 0);
+            }
+        });
+
+        return () => listener.subscription.unsubscribe();
     }, []);
 
     async function login(email, password) {
-        const { user: loggedInUser, token } = await apiLogin(email, password);
-        localStorage.setItem(TOKEN_KEY, token);
+        const loggedInUser = await apiLogin(email, password);
         setUser(loggedInUser);
         return loggedInUser;
     }
 
     async function register(name, email, password) {
-        const { user: newUser, token } = await apiRegister(name, email, password);
-        localStorage.setItem(TOKEN_KEY, token);
+        const newUser = await apiRegister(name, email, password);
         setUser(newUser);
         return newUser;
     }
 
-    function logout() {
-        localStorage.removeItem(TOKEN_KEY);
+    async function logout() {
+        await apiLogout();
         setUser(null);
     }
 

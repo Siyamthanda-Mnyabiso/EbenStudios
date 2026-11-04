@@ -1,18 +1,24 @@
+import PageHeader from "../components/ui/PageHeader";
+
 export default function Contact() {
     return (
-        <section className="max-w-7xl mx-auto px-6 lg:px-10 py-16">
-            <p className="uppercase tracking-[0.3em] text-sm text-neutral-500 mb-4">
-                Get In Touch
-            </p>
+        <section className="page page-section">
+            <PageHeader eyebrow="Get in touch" title="Contact us" />
 
-            <h1 className="text-4xl md:text-5xl font-black uppercase leading-none mb-6">
-                Contact Us
-            </h1>
-
-            <div className="text-neutral-600 max-w-2xl leading-relaxed space-y-2">
-                <p>Woodstock, Cape Town, South Africa</p>
-                <p>hello@ebenstudios.com</p>
-            </div>
+            <dl className="max-w-2xl border-t border-ink">
+                <div className="grid sm:grid-cols-3 gap-2 py-6 border-b border-line">
+                    <dt className="eyebrow">Studio</dt>
+                    <dd className="sm:col-span-2 title">Woodstock, Cape Town, South Africa</dd>
+                </div>
+                <div className="grid sm:grid-cols-3 gap-2 py-6 border-b border-line">
+                    <dt className="eyebrow">Email</dt>
+                    <dd className="sm:col-span-2 title">
+                        <a href="mailto:hello@ebenstudios.com" className="hover:text-ember underline underline-offset-4">
+                            hello@ebenstudios.com
+                        </a>
+                    </dd>
+                </div>
+            </dl>
         </section>
     );
 }

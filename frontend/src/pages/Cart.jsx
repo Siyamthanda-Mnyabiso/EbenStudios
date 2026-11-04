@@ -1,117 +1,90 @@
-import { Link } from "react-router-dom";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { useCart } from "../hooks/useCart";
 import { getProductImage } from "../lib/productImage";
 import Button from "../components/ui/Button";
+import PageHeader from "../components/ui/PageHeader";
+
+const qtyButton = "inline-flex items-center justify-center w-12 h-12 hover:text-ember transition-colors";
 
 export default function Cart() {
     const { items, updateQuantity, removeFromCart, subtotal } = useCart();
 
     if (items.length === 0) {
         return (
-            <section className="max-w-7xl mx-auto px-6 lg:px-10 py-16 text-center">
-                <p className="uppercase tracking-[0.3em] text-sm text-neutral-500 mb-4">
-                    Your Bag
-                </p>
+            <section className="page page-section">
+                <PageHeader eyebrow="Your bag" title="Cart" />
 
-                <h1 className="text-4xl md:text-5xl font-black uppercase leading-none mb-6">
-                    Cart
-                </h1>
-
-                <p className="text-neutral-600 max-w-xl mx-auto mb-10">
-                    Your cart is empty. Start shopping to add items.
-                </p>
-
-                <Button variant="outline" to="/shop">
-                    Continue Shopping
-                </Button>
+                <h2 className="title mb-2">Your cart is empty</h2>
+                <p className="text-ink-soft mb-8">Add something from the shop and it will show up here.</p>
+                <Button to="/shop">Browse the shop</Button>
             </section>
         );
     }
 
     return (
-        <section className="max-w-7xl mx-auto px-6 lg:px-10 py-16">
-            <p className="uppercase tracking-[0.3em] text-sm text-neutral-500 mb-4">
-                Your Bag
-            </p>
+        <section className="page page-section">
+            <PageHeader eyebrow="Your bag" title="Cart" />
 
-            <h1 className="text-4xl md:text-5xl font-black uppercase leading-none mb-10">
-                Cart
-            </h1>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                <div className="lg:col-span-2 flex flex-col gap-4">
+            <div className="grid lg:grid-cols-12 gap-12">
+                <ul className="lg:col-span-8 border-t border-line">
                     {items.map((item) => (
-                        <div
-                            key={item.id}
-                            className="flex items-center gap-4 bg-white rounded-3xl p-4 border border-black/5 shadow-sm"
-                        >
+                        <li key={item.id} className="flex flex-wrap items-center gap-x-6 gap-y-3 py-6 border-b border-line">
                             <img
                                 src={getProductImage(item)}
                                 alt={item.name}
-                                className="w-20 h-20 rounded-2xl object-cover shrink-0"
+                                className="w-24 h-32 object-cover bg-paper-deep shrink-0"
                             />
 
-                            <div className="flex-1 min-w-0">
-                                <h3 className="font-semibold truncate">{item.name}</h3>
-                                <p className="text-neutral-500 text-sm">
-                                    R {Number(item.price).toLocaleString()}
-                                </p>
+                            <div className="flex-1 min-w-[10rem]">
+                                <h2 className="title">{item.name}</h2>
+                                <p className="text-ink-soft">R {Number(item.price).toLocaleString()}</p>
                             </div>
 
-                            <div className="flex items-center gap-3 border border-black/10 rounded-full px-3 py-2">
+                            <div className="flex items-center border border-mute">
                                 <button
                                     onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                    aria-label="Decrease quantity"
-                                    className="text-neutral-500 hover:text-black transition"
+                                    aria-label={`Decrease quantity of ${item.name}`}
+                                    className={qtyButton}
                                 >
-                                    <Minus size={14} />
+                                    <Minus size={16} />
                                 </button>
-
-                                <span className="w-4 text-center text-sm font-semibold">
-                                    {item.quantity}
-                                </span>
-
+                                <span className="w-8 text-center font-bold" aria-live="polite">{item.quantity}</span>
                                 <button
                                     onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                    aria-label="Increase quantity"
-                                    className="text-neutral-500 hover:text-black transition"
+                                    aria-label={`Increase quantity of ${item.name}`}
+                                    className={qtyButton}
                                 >
-                                    <Plus size={14} />
+                                    <Plus size={16} />
                                 </button>
                             </div>
 
-                            <p className="w-24 text-right font-semibold">
+                            <p className="w-24 text-right font-bold">
                                 R {Number(item.price * item.quantity).toLocaleString()}
                             </p>
 
                             <button
                                 onClick={() => removeFromCart(item.id)}
-                                aria-label="Remove item"
-                                className="text-neutral-400 hover:text-red-600 transition"
+                                aria-label={`Remove ${item.name}`}
+                                className={`${qtyButton} text-mute hover:!text-danger`}
                             >
-                                <Trash2 size={18} />
+                                <Trash2 size={20} />
                             </button>
-                        </div>
+                        </li>
                     ))}
-                </div>
+                </ul>
 
-                <div className="bg-white rounded-3xl p-6 border border-black/5 shadow-sm h-fit">
-                    <h2 className="font-bold text-lg mb-6">Order Summary</h2>
+                <aside className="lg:col-span-4 h-fit bg-paper-deep p-8" aria-labelledby="summary-heading">
+                    <h2 id="summary-heading" className="title mb-6">Order summary</h2>
 
-                    <div className="flex items-center justify-between mb-6 text-neutral-600">
-                        <span>Subtotal</span>
-                        <span className="font-semibold text-black">
+                    <div className="flex items-baseline justify-between mb-8">
+                        <span className="text-ink-soft">Subtotal</span>
+                        <span className="text-3xl font-bold">
                             R {Number(subtotal).toLocaleString()}
                         </span>
                     </div>
 
-                    <Link to="/checkout">
-                        <button className="w-full bg-black text-white rounded-full py-4 font-semibold hover:bg-neutral-800 transition">
-                            Proceed to Checkout
-                        </button>
-                    </Link>
-                </div>
+                    <Button to="/checkout" className="w-full">Go to checkout</Button>
+                </aside>
             </div>
         </section>
     );

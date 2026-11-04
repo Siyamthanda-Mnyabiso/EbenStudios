@@ -1,21 +1,31 @@
+import heroImage from "../assets/hero_img.png";
+import Button from "../components/ui/Button";
+import PageHeader from "../components/ui/PageHeader";
+
 export default function About() {
     return (
-        <section className="max-w-7xl mx-auto px-6 lg:px-10 py-16">
-            <p className="uppercase tracking-[0.3em] text-sm text-neutral-500 mb-4">
-                Our Story
-            </p>
+        <section className="page page-section">
+            <PageHeader eyebrow="Our story" title="About Eben Studios" />
 
-            <h1 className="text-4xl md:text-5xl font-black uppercase leading-none mb-6">
-                About Eben Studios
-            </h1>
+            <div className="grid lg:grid-cols-12 gap-10 items-start">
+                <img
+                    src={heroImage}
+                    alt="Eben Studios streetwear"
+                    className="lg:col-span-7 w-full aspect-[4/3] object-cover"
+                />
 
-            <p className="text-neutral-600 max-w-2xl leading-relaxed">
-                Nested in the heart of Woodstock, Eben Studios delivers modern
-                streetwear inspired by culture, movement, and self-expression.
-                Founded in 2023, we design contemporary streetwear for
-                creators, visionaries, and individuals inspired by urban
-                culture.
-            </p>
+                <div className="lg:col-span-5 text-lg text-ink-soft space-y-6 max-w-prose">
+                    <p className="text-3xl font-bold tracking-tight text-ink leading-tight">
+                        Nested in the heart of Woodstock.
+                    </p>
+                    <p>
+                        Eben Studios delivers modern streetwear inspired by culture, movement and
+                        self expression. Founded in 2023, we design contemporary streetwear for
+                        creators, visionaries and individuals inspired by urban culture.
+                    </p>
+                    <Button to="/shop">Shop the collection</Button>
+                </div>
+            </div>
         </section>
     );
 }
