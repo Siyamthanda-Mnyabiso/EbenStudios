@@ -180,7 +180,7 @@ export default function Products() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                         <Input label="Name" type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-                        <Input label="Tag" optional hint="For example New or Limited" type="text" value={form.tag} onChange={(e) => setForm({ ...form, tag: e.target.value })} />
+                        <Input label="Tag" optional placeholder="For example New or Limited" type="text" value={form.tag} onChange={(e) => setForm({ ...form, tag: e.target.value })} />
                         <Input label="Price (R)" type="number" min="0" step="0.01" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
                         <Input label="Stock" type="number" min="0" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} />
 
