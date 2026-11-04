@@ -1,5 +1,6 @@
 import { supabase, unwrap, PRODUCT_IMAGE_BUCKET } from "./supabase";
 import { toProductShape as toProduct } from "./productShape";
+import { parseList } from "../lib/productOptions";
 
 export async function getProducts() {
     const rows = unwrap(
@@ -40,13 +41,15 @@ async function deleteImage(imageUrl) {
     await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove([path]);
 }
 
-function toRow({ name, description, price, stock, tag }) {
+function toRow({ name, description, price, stock, tag, sizes, colors }) {
     return {
         name,
         description: description || null,
         price: Number(price),
         stock: Number(stock ?? 0),
         tag: tag || null,
+        sizes: parseList(sizes),
+        colors: parseList(colors),
     };
 }
 

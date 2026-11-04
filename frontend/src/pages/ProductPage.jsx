@@ -5,6 +5,8 @@ import { getProduct } from "../service/productService";
 import { useCart } from "../hooks/useCart";
 import { getProductImage } from "../lib/productImage";
 import Button from "../components/ui/Button";
+import OptionGroup from "../components/products/OptionGroup";
+import { defaultSelection } from "../lib/productOptions";
 
 export default function ProductPage() {
     const { id } = useParams();
@@ -13,9 +15,28 @@ export default function ProductPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [added, setAdded] = useState(false);
+    const [size, setSize] = useState(null);
+    const [color, setColor] = useState(null);
+    const [errors, setErrors] = useState({});
 
     function handleAddToCart() {
-        addToCart(product);
+        const missing = {};
+
+        if (product.sizes.length > 0 && !size) {
+            missing.size = "Choose a size";
+        }
+
+        if (product.colors.length > 0 && !color) {
+            missing.color = "Choose a colour";
+        }
+
+        setErrors(missing);
+
+        if (Object.keys(missing).length > 0) {
+            return;
+        }
+
+        addToCart(product, { size, color });
         setAdded(true);
         setTimeout(() => setAdded(false), 2000);
     }
@@ -24,6 +45,11 @@ export default function ProductPage() {
         getProduct(id)
             .then((data) => {
                 setProduct(data);
+                // Single option products need no choosing.
+                const preset = defaultSelection(data);
+                setSize(preset.size);
+                setColor(preset.color);
+                setErrors({});
                 setError("");
             })
             .catch((err) => setError(err.message || "Product not found."))
@@ -86,6 +112,32 @@ export default function ProductPage() {
                     <p className={`font-bold mb-8 ${inStock ? "text-ink" : "field-error"}`}>
                         {inStock ? `In stock, ${product.stock} available` : "Sold out"}
                     </p>
+
+                    {product.colors.length > 0 && (
+                        <OptionGroup
+                            legend="Colour"
+                            options={product.colors}
+                            value={color}
+                            onChange={(value) => {
+                                setColor(value);
+                                setErrors((current) => ({ ...current, color: undefined }));
+                            }}
+                            error={errors.color}
+                        />
+                    )}
+
+                    {product.sizes.length > 0 && (
+                        <OptionGroup
+                            legend="Size"
+                            options={product.sizes}
+                            value={size}
+                            onChange={(value) => {
+                                setSize(value);
+                                setErrors((current) => ({ ...current, size: undefined }));
+                            }}
+                            error={errors.size}
+                        />
+                    )}
 
                     <Button onClick={handleAddToCart} disabled={!inStock} className="w-full sm:w-auto">
                         {added ? "Added to cart" : "Add to cart"}

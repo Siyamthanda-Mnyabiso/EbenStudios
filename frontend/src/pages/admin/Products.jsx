@@ -9,7 +9,7 @@ import {
 import Input from "../../components/ui/Input";
 import { getProductImage } from "../../lib/productImage";
 
-const emptyForm = { name: "", description: "", price: "", stock: "", tag: "" };
+const emptyForm = { name: "", description: "", price: "", stock: "", tag: "", sizes: "", colors: "" };
 
 export default function Products() {
     const [products, setProducts] = useState([]);
@@ -74,6 +74,8 @@ export default function Products() {
             price: product.price,
             stock: product.stock,
             tag: product.tag || "",
+            sizes: product.sizes.join(", "),
+            colors: product.colors.join(", "),
         });
         setImageFile(null);
         setExistingImageUrl(product.imageUrl || null);
@@ -184,6 +186,23 @@ export default function Products() {
                         <Input label="Price (R)" type="number" min="0" step="0.01" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
                         <Input label="Stock" type="number" min="0" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} />
 
+                        <Input
+                            label="Sizes"
+                            optional
+                            hint="Separate with commas, for example S, M, L, XL"
+                            type="text"
+                            value={form.sizes}
+                            onChange={(e) => setForm({ ...form, sizes: e.target.value })}
+                        />
+                        <Input
+                            label="Colours"
+                            optional
+                            hint="Separate with commas, for example Black, White"
+                            type="text"
+                            value={form.colors}
+                            onChange={(e) => setForm({ ...form, colors: e.target.value })}
+                        />
+
                         <div className="sm:col-span-2">
                             <label htmlFor="product-description" className="field-label">
                                 Description <span className="font-normal text-mute">(optional)</span>
@@ -250,7 +269,14 @@ export default function Products() {
                                         className="w-12 h-12 object-cover"
                                     />
                                 </td>
-                                <td className="px-6 py-4 font-semibold">{product.name}</td>
+                                <td className="px-6 py-4">
+                                    <p className="font-semibold">{product.name}</p>
+                                    {(product.sizes.length > 0 || product.colors.length > 0) && (
+                                        <p className="text-sm text-mute">
+                                            {[product.sizes.length > 0 && `Sizes ${product.sizes.join(", ")}`, product.colors.length > 0 && `Colours ${product.colors.join(", ")}`].filter(Boolean).join(". ")}
+                                        </p>
+                                    )}
+                                </td>
                                 <td className="px-6 py-4 text-ink-soft">
                                     R {Number(product.price).toLocaleString()}
                                 </td>

@@ -4,7 +4,7 @@ import { toProductShape } from "./productShape";
 const ORDER_SELECT = `
     id, user_id, total, status, shipping_address, created_at,
     user:profiles ( id, name, email ),
-    items:order_items ( id, quantity, price, product_id, product:products ( * ) )
+    items:order_items ( id, quantity, price, size, color, product_id, product:products ( * ) )
 `;
 
 function toOrder(row) {
@@ -21,6 +21,8 @@ function toOrder(row) {
             quantity: item.quantity,
             price: Number(item.price),
             productId: item.product_id,
+            size: item.size,
+            color: item.color,
             product: toProductShape(item.product),
         })),
     };

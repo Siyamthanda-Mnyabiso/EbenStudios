@@ -3,14 +3,16 @@ import { Plus, Check } from "lucide-react";
 import { useState } from "react";
 import { getProductImage } from "../../lib/productImage";
 import { useCart } from "../../hooks/useCart";
+import { needsChoice, defaultSelection } from "../../lib/productOptions";
 
 export default function ProductCard({ product }) {
     const { addToCart } = useCart();
     const [added, setAdded] = useState(false);
     const soldOut = product.stock <= 0;
+    const choose = needsChoice(product);
 
     function handleAdd() {
-        addToCart(product);
+        addToCart(product, defaultSelection(product));
         setAdded(true);
         setTimeout(() => setAdded(false), 1500);
     }
@@ -42,15 +44,25 @@ export default function ProductCard({ product }) {
                     </Link>
                 </div>
 
-                <button
-                    type="button"
-                    onClick={handleAdd}
-                    disabled={soldOut}
-                    aria-label={soldOut ? `${product.name} is sold out` : `Add ${product.name} to cart`}
-                    className="shrink-0 inline-flex items-center justify-center w-12 h-12 -mt-2 -mr-3 hover:bg-black hover:text-white rounded-full transition-colors disabled:opacity-40"
-                >
-                    {added ? <Check size={18} /> : <Plus size={18} />}
-                </button>
+                {choose && !soldOut ? (
+                    <Link
+                        to={`/products/${product.id}`}
+                        aria-label={`Choose options for ${product.name}`}
+                        className="shrink-0 inline-flex items-center justify-center w-12 h-12 -mt-2 -mr-3 hover:bg-black hover:text-white rounded-full transition-colors"
+                    >
+                        <Plus size={18} />
+                    </Link>
+                ) : (
+                    <button
+                        type="button"
+                        onClick={handleAdd}
+                        disabled={soldOut}
+                        aria-label={soldOut ? `${product.name} is sold out` : `Add ${product.name} to cart`}
+                        className="shrink-0 inline-flex items-center justify-center w-12 h-12 -mt-2 -mr-3 hover:bg-black hover:text-white rounded-full transition-colors disabled:opacity-40"
+                    >
+                        {added ? <Check size={18} /> : <Plus size={18} />}
+                    </button>
+                )}
             </div>
 
             <p className="pt-3">

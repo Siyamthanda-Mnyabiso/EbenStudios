@@ -41,9 +41,9 @@ async function seedProducts() {
     // Placeholders based on the items visible on the brand's Instagram. Replace in the admin.
     const description = "Placeholder product. Replace the name, price and photo in the admin.";
     const products = [
-        { name: "White tee", description, price: 549, stock: 10, tag: "Placeholder" },
-        { name: "Red shorts", description, price: 799, stock: 10, tag: "Placeholder" },
-        { name: "Cap", description, price: 399, stock: 10, tag: "Placeholder" },
+        { name: "White tee", description, price: 549, stock: 10, tag: "Placeholder", sizes: ["S", "M", "L", "XL"], colors: ["White", "Black"] },
+        { name: "Red shorts", description, price: 799, stock: 10, tag: "Placeholder", sizes: ["S", "M", "L", "XL"], colors: ["Red"] },
+        { name: "Cap", description, price: 399, stock: 10, tag: "Placeholder", sizes: [], colors: ["Red"] },
     ];
 
     const { error } = await supabase.from("products").upsert(products, { onConflict: "name", ignoreDuplicates: true });
