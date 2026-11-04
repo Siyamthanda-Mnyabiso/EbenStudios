@@ -6,6 +6,7 @@ import {
     updateProduct,
     deleteProduct,
 } from "../../service/productService";
+import Input from "../../components/ui/Input";
 import { getProductImage } from "../../lib/productImage";
 
 const emptyForm = { name: "", description: "", price: "", stock: "", tag: "" };
@@ -50,7 +51,7 @@ export default function Products() {
         try {
             setProducts(await getProducts());
         } catch (err) {
-            setError(err.response?.data?.message || "Failed to load products.");
+            setError(err.message || "Failed to load products.");
         } finally {
             setLoading(false);
         }
@@ -101,7 +102,7 @@ export default function Products() {
             closeForm();
             await loadProducts();
         } catch (err) {
-            setFormError(err.response?.data?.message || "Failed to save product.");
+            setFormError(err.message || "Failed to save product.");
         } finally {
             setSaving(false);
         }
@@ -115,7 +116,7 @@ export default function Products() {
             setConfirmDeleteId(null);
             await loadProducts();
         } catch (err) {
-            setError(err.response?.data?.message || "Failed to delete product.");
+            setError(err.message || "Failed to delete product.");
         } finally {
             setDeletingId(null);
         }
@@ -126,48 +127,48 @@ export default function Products() {
     return (
         <div>
             <div className="flex items-center justify-between mb-8">
-                <h1 className="text-3xl font-black uppercase leading-none">
+                <h1 className="headline">
                     Products
                 </h1>
 
                 <button
                     onClick={openAddForm}
-                    className="flex items-center gap-2 bg-black text-white px-5 py-3 rounded-full font-semibold hover:bg-neutral-800 transition"
+                    className="inline-flex items-center gap-2 min-h-12 bg-ember text-white px-5 font-bold hover:bg-ember-deep transition-colors"
                 >
                     <Plus size={18} />
-                    Add Product
+                    Add product
                 </button>
             </div>
 
             {formOpen && (
                 <form
                     onSubmit={handleSubmit}
-                    className="bg-white rounded-3xl border border-black/5 shadow-sm p-6 mb-6"
+                    className="bg-white border border-line p-6 mb-6"
                 >
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="font-bold text-lg">
-                            {editingId ? "Edit Product" : "New Product"}
+                            {editingId ? "Edit product" : "New product"}
                         </h2>
 
-                        <button type="button" onClick={closeForm} className="text-neutral-400 hover:text-black transition">
+                        <button type="button" onClick={closeForm} aria-label="Close form" className="inline-flex items-center justify-center w-12 h-12 -mr-3 text-mute hover:text-ink transition-colors">
                             <X size={20} />
                         </button>
                     </div>
 
                     {formError && (
-                        <p className="text-sm text-red-600 mb-4">{formError}</p>
+                        <p className="field-error mb-4">{formError}</p>
                     )}
 
                     <div className="flex items-center gap-4 mb-4">
-                        <div className="w-20 h-20 rounded-2xl bg-neutral-100 overflow-hidden shrink-0">
+                        <div className="w-20 h-24 bg-paper-deep overflow-hidden shrink-0">
                             {displayImage && (
                                 <img src={displayImage} alt="Preview" className="w-full h-full object-cover" />
                             )}
                         </div>
 
-                        <label className="flex items-center gap-2 border border-black/10 rounded-full px-4 py-2 text-sm font-semibold cursor-pointer hover:bg-neutral-50 transition">
+                        <label className="inline-flex items-center gap-2 min-h-12 border border-ink px-4 font-bold cursor-pointer hover:bg-ink hover:text-paper transition-colors focus-within:outline-2 focus-within:outline-ember">
                             <Upload size={16} />
-                            {imageFile ? imageFile.name : "Upload Image"}
+                            {imageFile ? imageFile.name : "Upload image"}
                             <input
                                 type="file"
                                 accept="image/jpeg,image/png,image/webp,image/gif"
@@ -177,72 +178,44 @@ export default function Products() {
                         </label>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                        <input
-                            type="text"
-                            required
-                            placeholder="Name"
-                            value={form.name}
-                            onChange={(e) => setForm({ ...form, name: e.target.value })}
-                            className="rounded-xl px-4 py-3 border border-black/10 focus:outline-none"
-                        />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+                        <Input label="Name" type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+                        <Input label="Tag" optional hint="For example New or Limited" type="text" value={form.tag} onChange={(e) => setForm({ ...form, tag: e.target.value })} />
+                        <Input label="Price (R)" type="number" min="0" step="0.01" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
+                        <Input label="Stock" type="number" min="0" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} />
 
-                        <input
-                            type="text"
-                            placeholder="Tag (e.g. New, Limited)"
-                            value={form.tag}
-                            onChange={(e) => setForm({ ...form, tag: e.target.value })}
-                            className="rounded-xl px-4 py-3 border border-black/10 focus:outline-none"
-                        />
-
-                        <input
-                            type="number"
-                            required
-                            min="0"
-                            step="0.01"
-                            placeholder="Price"
-                            value={form.price}
-                            onChange={(e) => setForm({ ...form, price: e.target.value })}
-                            className="rounded-xl px-4 py-3 border border-black/10 focus:outline-none"
-                        />
-
-                        <input
-                            type="number"
-                            required
-                            min="0"
-                            placeholder="Stock"
-                            value={form.stock}
-                            onChange={(e) => setForm({ ...form, stock: e.target.value })}
-                            className="rounded-xl px-4 py-3 border border-black/10 focus:outline-none"
-                        />
-
-                        <textarea
-                            placeholder="Description"
-                            value={form.description}
-                            onChange={(e) => setForm({ ...form, description: e.target.value })}
-                            className="rounded-xl px-4 py-3 border border-black/10 focus:outline-none sm:col-span-2"
-                            rows={2}
-                        />
+                        <div className="sm:col-span-2">
+                            <label htmlFor="product-description" className="field-label">
+                                Description <span className="font-normal text-mute">(optional)</span>
+                            </label>
+                            <textarea
+                                id="product-description"
+                                value={form.description}
+                                onChange={(e) => setForm({ ...form, description: e.target.value })}
+                                className="field"
+                                rows={3}
+                            />
+                        </div>
                     </div>
 
                     <button
                         type="submit"
                         disabled={saving}
-                        className="bg-black text-white px-5 py-3 rounded-full font-semibold hover:bg-neutral-800 transition disabled:opacity-50"
+                        className="min-h-12 bg-ember text-white px-6 font-bold hover:bg-ember-deep transition-colors disabled:opacity-60"
                     >
-                        {saving ? "Saving..." : editingId ? "Save Changes" : "Create Product"}
+                        {saving ? "Saving" : editingId ? "Save changes" : "Create product"}
                     </button>
                 </form>
             )}
 
             {error && (
-                <p className="text-sm text-red-600 mb-4">{error}</p>
+                <p className="field-error mb-4">{error}</p>
             )}
 
-            <div className="bg-white rounded-3xl border border-black/5 shadow-sm overflow-hidden">
+            <div className="bg-white border border-line overflow-hidden">
                 <table className="w-full text-left">
                     <thead>
-                        <tr className="border-b border-black/5 text-sm text-neutral-500">
+                        <tr className="border-b border-line text-sm text-mute">
                             <th className="px-6 py-4 font-medium" aria-label="Image"></th>
                             <th className="px-6 py-4 font-medium">Name</th>
                             <th className="px-6 py-4 font-medium">Price</th>
@@ -254,64 +227,64 @@ export default function Products() {
                     <tbody>
                         {loading && (
                             <tr>
-                                <td colSpan={5} className="px-6 py-8 text-center text-neutral-500">
-                                    Loading products...
+                                <td colSpan={5} className="px-6 py-8 text-center text-mute">
+                                    Loading products
                                 </td>
                             </tr>
                         )}
 
                         {!loading && products.length === 0 && (
                             <tr>
-                                <td colSpan={5} className="px-6 py-8 text-center text-neutral-500">
+                                <td colSpan={5} className="px-6 py-8 text-center text-mute">
                                     No products yet.
                                 </td>
                             </tr>
                         )}
 
                         {!loading && products.map((product) => (
-                            <tr key={product.id} className="border-b border-black/5 last:border-0">
+                            <tr key={product.id} className="border-b border-line last:border-0">
                                 <td className="px-6 py-4">
                                     <img
                                         src={getProductImage(product)}
                                         alt={product.name}
-                                        className="w-12 h-12 rounded-xl object-cover"
+                                        className="w-12 h-12 object-cover"
                                     />
                                 </td>
                                 <td className="px-6 py-4 font-semibold">{product.name}</td>
-                                <td className="px-6 py-4 text-neutral-600">
+                                <td className="px-6 py-4 text-ink-soft">
                                     R {Number(product.price).toLocaleString()}
                                 </td>
-                                <td className="px-6 py-4 text-neutral-600">{product.stock}</td>
+                                <td className="px-6 py-4 text-ink-soft">{product.stock}</td>
                                 <td className="px-6 py-4">
                                     {confirmDeleteId === product.id ? (
                                         <div className="flex items-center justify-end gap-3 text-sm">
-                                            <span className="text-neutral-500">Delete?</span>
+                                            <span className="text-mute">Delete?</span>
                                             <button
                                                 onClick={() => handleDelete(product.id)}
                                                 disabled={deletingId === product.id}
-                                                className="font-semibold text-red-600 hover:text-red-700 transition disabled:opacity-50"
+                                                className="inline-flex items-center min-h-12 px-2 font-bold text-danger hover:underline disabled:opacity-60"
                                             >
-                                                {deletingId === product.id ? "Deleting..." : "Confirm"}
+                                                {deletingId === product.id ? "Deleting" : "Confirm"}
                                             </button>
                                             <button
                                                 onClick={() => setConfirmDeleteId(null)}
-                                                className="text-neutral-500 hover:text-black transition"
+                                                className="inline-flex items-center min-h-12 px-2 text-ink-soft hover:underline"
                                             >
                                                 Cancel
                                             </button>
                                         </div>
                                     ) : (
-                                        <div className="flex items-center justify-end gap-3 text-neutral-400">
+                                        <div className="flex items-center justify-end gap-3 text-mute">
                                             <button
                                                 onClick={() => openEditForm(product)}
-                                                className="hover:text-black transition"
-                                                aria-label="Edit"
+                                                className="inline-flex items-center justify-center w-12 h-12 hover:text-ink transition-colors"
+                                                aria-label={`Edit ${product.name}`}
                                             >
                                                 <Pencil size={16} />
                                             </button>
                                             <button
                                                 onClick={() => setConfirmDeleteId(product.id)}
-                                                className="hover:text-red-600 transition"
+                                                className="hover:text-danger transition"
                                                 aria-label="Delete"
                                             >
                                                 <Trash2 size={16} />

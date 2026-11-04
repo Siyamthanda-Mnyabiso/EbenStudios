@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import Button from "../components/ui/Button";
+import Input from "../components/ui/Input";
 
 export default function Register() {
     const { register } = useAuth();
@@ -20,71 +22,47 @@ export default function Register() {
             await register(name, email, password);
             navigate("/");
         } catch (err) {
-            setError(err.response?.data?.message || "Something went wrong. Please try again.");
+            setError(err.message || "Something went wrong. Please try again.");
         } finally {
             setSubmitting(false);
         }
     }
 
     return (
-        <section className="max-w-md mx-auto px-6 py-20">
-            <p className="uppercase tracking-[0.3em] text-sm text-neutral-500 mb-4 text-center">
-                Join Eben Studios
-            </p>
+        <section className="page page-section">
+            <div className="max-w-md">
+                <p className="eyebrow mb-3">Join Eben Studios</p>
+                <h1 className="display mb-10">Create account</h1>
 
-            <h1 className="text-4xl font-black uppercase leading-none mb-8 text-center">
-                Register
-            </h1>
+                <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+                    {error && <p role="alert" className="field-error">{error}</p>}
 
-            {error && (
-                <p className="text-center text-sm text-red-600 mb-4">
-                    {error}
+                    <Input label="Full name" type="text" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} />
+                    <Input label="Email address" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                    <Input
+                        label="Password"
+                        hint="At least 6 characters"
+                        type="password"
+                        autoComplete="new-password"
+                        minLength={6}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+
+                    <div>
+                        <Button type="submit" disabled={submitting}>
+                            {submitting ? "Creating account" : "Create account"}
+                        </Button>
+                    </div>
+                </form>
+
+                <p className="text-ink-soft mt-8">
+                    Already have an account?{" "}
+                    <Link to="/login" className="font-bold text-ember underline underline-offset-4">
+                        Log in
+                    </Link>
                 </p>
-            )}
-
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                <input
-                    type="text"
-                    required
-                    placeholder="Full name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="rounded-full px-6 py-4 border border-black/10 bg-white focus:outline-none"
-                />
-
-                <input
-                    type="email"
-                    required
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="rounded-full px-6 py-4 border border-black/10 bg-white focus:outline-none"
-                />
-
-                <input
-                    type="password"
-                    required
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="rounded-full px-6 py-4 border border-black/10 bg-white focus:outline-none"
-                />
-
-                <button
-                    type="submit"
-                    disabled={submitting}
-                    className="bg-black text-white rounded-full px-6 py-4 font-semibold hover:bg-neutral-800 transition disabled:opacity-50"
-                >
-                    {submitting ? "Creating Account..." : "Create Account"}
-                </button>
-            </form>
-
-            <p className="text-center text-sm text-neutral-500 mt-6">
-                Already have an account?{" "}
-                <Link to="/login" className="text-black font-semibold">
-                    Log in
-                </Link>
-            </p>
+            </div>
         </section>
     );
 }

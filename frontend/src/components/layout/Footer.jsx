@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import logo from "../../assets/logo.svg";
+import Reveal from "../ui/Reveal";
 
 function InstagramIcon(props) {
     return (
@@ -27,60 +27,62 @@ function FacebookIcon(props) {
     );
 }
 
+const shopLinks = ["Hoodies", "T-shirts", "Outerwear", "Accessories"];
+
+const footerLink = "inline-flex items-center min-h-12 hover:text-white hover:underline underline-offset-4";
+
 export default function Footer() {
     return (
-        <footer className="bg-black text-neutral-300">
-            <div className="max-w-7xl mx-auto px-6 lg:px-10 py-16">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
-                    <div>
-                        <img
-                            src={logo}
-                            alt="Eben Studios"
-                            className="w-14 h-14 object-contain mb-4"
-                        />
+        <footer className="bg-black text-white">
+            <div className="page py-16 lg:py-24">
+                <Reveal as="p" className="font-display font-extrabold tracking-tight text-[clamp(2.25rem,9vw,8rem)] leading-[0.9] mb-12">
+                    Eben Studios
+                </Reveal>
 
-                        <p className="text-sm leading-relaxed max-w-xs">
-                            Modern streetwear inspired by culture, movement,
-                            and self-expression. Based in Woodstock,
-                            Cape Town.
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-10 border-t border-white/20 pt-10">
+                    <div className="md:col-span-1">
+                        <p className="max-w-xs text-white/80">
+                            Modern streetwear inspired by culture, movement and self expression.
+                            Based in Woodstock, Cape Town.
                         </p>
                     </div>
 
-                    <div>
-                        <h4 className="text-white font-semibold mb-4">Shop</h4>
-                        <ul className="space-y-3 text-sm">
-                            <li><Link to="/shop" className="hover:text-white transition">Hoodies</Link></li>
-                            <li><Link to="/shop" className="hover:text-white transition">T-Shirts</Link></li>
-                            <li><Link to="/shop" className="hover:text-white transition">Outerwear</Link></li>
-                            <li><Link to="/shop" className="hover:text-white transition">Accessories</Link></li>
+                    <nav aria-label="Shop">
+                        <h2 className="eyebrow !text-white/70 mb-2">Shop</h2>
+                        <ul>
+                            {shopLinks.map((label) => (
+                                <li key={label}>
+                                    <Link to="/shop" className={footerLink}>{label}</Link>
+                                </li>
+                            ))}
                         </ul>
-                    </div>
+                    </nav>
+
+                    <nav aria-label="Company">
+                        <h2 className="eyebrow !text-white/70 mb-2">Company</h2>
+                        <ul>
+                            <li><Link to="/about" className={footerLink}>About</Link></li>
+                            <li><Link to="/contact" className={footerLink}>Contact</Link></li>
+                            <li><Link to="/orders" className={footerLink}>Orders</Link></li>
+                        </ul>
+                    </nav>
 
                     <div>
-                        <h4 className="text-white font-semibold mb-4">Company</h4>
-                        <ul className="space-y-3 text-sm">
-                            <li><Link to="/about" className="hover:text-white transition">About</Link></li>
-                            <li><Link to="/contact" className="hover:text-white transition">Contact</Link></li>
-                            <li><Link to="/orders" className="hover:text-white transition">Orders</Link></li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h4 className="text-white font-semibold mb-4">Follow Us</h4>
-                        <div className="flex items-center gap-4">
-                            <a href="#" className="hover:text-white transition"><InstagramIcon /></a>
-                            <a href="#" className="hover:text-white transition"><TwitterIcon /></a>
-                            <a href="#" className="hover:text-white transition"><FacebookIcon /></a>
+                        <h2 className="eyebrow !text-white/70 mb-2">Follow</h2>
+                        <div className="flex items-center -ml-3">
+                            <a href="#" aria-label="Instagram" className="inline-flex items-center justify-center w-12 h-12 hover:text-white"><InstagramIcon /></a>
+                            <a href="#" aria-label="X" className="inline-flex items-center justify-center w-12 h-12 hover:text-white"><TwitterIcon /></a>
+                            <a href="#" aria-label="Facebook" className="inline-flex items-center justify-center w-12 h-12 hover:text-white"><FacebookIcon /></a>
                         </div>
                     </div>
                 </div>
 
-                <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-neutral-500">
-                    <p>&copy; {new Date().getFullYear()} Eben Studios. All rights reserved.</p>
+                <div className="border-t border-white/20 mt-10 pt-8 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-white/70">
+                    <p>&copy; {new Date().getFullYear()} Eben Studios</p>
 
                     <div className="flex items-center gap-6">
-                        <a href="#" className="hover:text-white transition">Privacy Policy</a>
-                        <a href="#" className="hover:text-white transition">Terms of Service</a>
+                        <a href="#" className={footerLink}>Privacy</a>
+                        <a href="#" className={footerLink}>Terms</a>
                     </div>
                 </div>
             </div>

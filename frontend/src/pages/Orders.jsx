@@ -2,14 +2,8 @@ import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { getMyOrders } from "../service/orderService";
-
-const statusStyles = {
-    Paid: "bg-green-100 text-green-700",
-    Pending: "bg-yellow-100 text-yellow-700",
-    Shipped: "bg-blue-100 text-blue-700",
-    Delivered: "bg-purple-100 text-purple-700",
-    Cancelled: "bg-red-100 text-red-700",
-};
+import Button from "../components/ui/Button";
+import PageHeader from "../components/ui/PageHeader";
 
 export default function Orders() {
     const { user, loading: authLoading } = useAuth();
@@ -25,7 +19,7 @@ export default function Orders() {
 
         getMyOrders()
             .then(setOrders)
-            .catch((err) => setError(err.response?.data?.message || "Failed to load orders."))
+            .catch((err) => setError(err.message || "Failed to load orders."))
             .finally(() => setLoading(false));
     }, [user]);
 
@@ -38,71 +32,55 @@ export default function Orders() {
     }
 
     return (
-        <section className="max-w-7xl mx-auto px-6 lg:px-10 py-16">
-            <p className="uppercase tracking-[0.3em] text-sm text-neutral-500 mb-4">
-                Your Orders
-            </p>
-
-            <h1 className="text-4xl md:text-5xl font-black uppercase leading-none mb-10">
-                Orders
-            </h1>
+        <section className="page page-section">
+            <PageHeader eyebrow="Your orders" title="Orders" />
 
             {location.state?.justOrderedId && (
-                <div className="bg-green-50 text-green-700 rounded-2xl px-6 py-4 mb-8 font-semibold">
-                    Order #EB-{location.state.justOrderedId} placed successfully!
-                </div>
-            )}
-
-            {loading && (
-                <p className="text-neutral-500">Loading orders...</p>
-            )}
-
-            {error && (
-                <p className="text-red-600">{error}</p>
-            )}
-
-            {!loading && !error && orders.length === 0 && (
-                <p className="text-neutral-600 max-w-2xl">
-                    You have no orders yet.
+                <p role="status" className="border-l-4 border-ember bg-paper-deep px-6 py-4 mb-10 font-bold">
+                    Order #EB-{location.state.justOrderedId} placed. Thank you!
                 </p>
             )}
 
-            {!loading && !error && orders.length > 0 && (
-                <div className="flex flex-col gap-4">
-                    {orders.map((order) => (
-                        <div
-                            key={order.id}
-                            className="bg-white rounded-3xl border border-black/5 shadow-sm p-6"
-                        >
-                            <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-                                <div>
-                                    <p className="font-bold text-lg">#EB-{order.id}</p>
-                                    <p className="text-sm text-neutral-500">
-                                        {new Date(order.createdAt).toLocaleDateString()}
-                                    </p>
-                                </div>
+            {loading && <p role="status" className="text-ink-soft">Loading orders</p>}
 
-                                <span className={`text-xs font-semibold px-3 py-1 rounded-full ${statusStyles[order.status] || "bg-neutral-100 text-neutral-700"}`}>
-                                    {order.status}
-                                </span>
-                            </div>
+            {error && <p role="alert" className="field-error">{error}</p>}
 
-                            <div className="flex flex-col gap-2 mb-4">
-                                {order.items.map((item) => (
-                                    <div key={item.id} className="flex items-center justify-between text-sm text-neutral-600">
-                                        <span>{item.product.name} × {item.quantity}</span>
-                                        <span>R {Number(item.price * item.quantity).toLocaleString()}</span>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className="flex items-center justify-between border-t border-black/5 pt-4">
-                                <span className="text-neutral-500">Total</span>
-                                <span className="font-bold">R {Number(order.total).toLocaleString()}</span>
-                            </div>
-                        </div>
-                    ))}
+            {!loading && !error && orders.length === 0 && (
+                <div>
+                    <h2 className="title mb-2">No orders yet</h2>
+                    <p className="text-ink-soft mb-8">When you place an order it will appear here.</p>
+                    <Button to="/shop">Browse the shop</Button>
                 </div>
+            )}
+
+            {!loading && !error && orders.length > 0 && (
+                <ul className="border-t border-ink">
+                    {orders.map((order) => (
+                        <li key={order.id} className="grid lg:grid-cols-12 gap-6 py-8 border-b border-line">
+                            <div className="lg:col-span-3">
+                                <p className="title">#EB-{order.id}</p>
+                                <p className="text-ink-soft">{new Date(order.createdAt).toLocaleDateString()}</p>
+                                <p className="mt-3 inline-block border border-ink px-3 py-1 font-bold text-sm">
+                                    {order.status}
+                                </p>
+                            </div>
+
+                            <ul className="lg:col-span-6 flex flex-col gap-2">
+                                {order.items.map((item) => (
+                                    <li key={item.id} className="flex justify-between gap-4">
+                                        <span>{item.product?.name} x {item.quantity}</span>
+                                        <span className="text-ink-soft">R {Number(item.price * item.quantity).toLocaleString()}</span>
+                                    </li>
+                                ))}
+                            </ul>
+
+                            <p className="lg:col-span-3 lg:text-right">
+                                <span className="eyebrow block mb-1">Total</span>
+                                <span className="text-3xl font-bold">R {Number(order.total).toLocaleString()}</span>
+                            </p>
+                        </li>
+                    ))}
+                </ul>
             )}
         </section>
     );

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import { getProduct } from "../service/productService";
 import { useCart } from "../hooks/useCart";
 import { getProductImage } from "../lib/productImage";
@@ -25,36 +26,38 @@ export default function ProductPage() {
                 setProduct(data);
                 setError("");
             })
-            .catch((err) => setError(err.response?.data?.message || "Product not found."))
+            .catch((err) => setError(err.message || "Product not found."))
             .finally(() => setLoading(false));
     }, [id]);
 
     if (loading) {
         return (
-            <section className="max-w-7xl mx-auto px-6 lg:px-10 py-16">
-                <p className="text-neutral-500">Loading product...</p>
+            <section className="page page-section">
+                <p role="status" className="text-ink-soft">Loading product</p>
             </section>
         );
     }
 
     if (error || !product) {
         return (
-            <section className="max-w-7xl mx-auto px-6 lg:px-10 py-16 text-center">
-                <h1 className="text-3xl font-black uppercase leading-none mb-6">
-                    {error || "Product not found."}
-                </h1>
-
-                <Button variant="outline" to="/shop">
-                    Back to Shop
-                </Button>
+            <section className="page page-section">
+                <h1 className="headline mb-8">{error || "Product not found"}</h1>
+                <Button variant="secondary" to="/shop">Back to shop</Button>
             </section>
         );
     }
 
+    const inStock = product.stock > 0;
+
     return (
-        <section className="max-w-7xl mx-auto px-6 lg:px-10 py-16">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                <div className="relative aspect-square rounded-3xl bg-neutral-200 overflow-hidden">
+        <section className="page pt-8 pb-16 lg:pb-24">
+            <Link to="/shop" className="inline-flex items-center gap-2 min-h-12 font-medium hover:text-ember">
+                <ArrowLeft size={18} aria-hidden="true" />
+                All products
+            </Link>
+
+            <div className="grid lg:grid-cols-12 gap-10 lg:gap-16 mt-4">
+                <div className="lg:col-span-7 relative aspect-[4/5] bg-paper-deep overflow-hidden">
                     <img
                         src={getProductImage(product)}
                         alt={product.name}
@@ -62,48 +65,33 @@ export default function ProductPage() {
                     />
 
                     {product.tag && (
-                        <span className="absolute top-4 left-4 bg-black text-white text-xs uppercase tracking-[0.15em] px-3 py-1 rounded-full">
+                        <span className="absolute top-0 left-0 bg-ink text-paper text-sm font-bold px-3 py-1.5">
                             {product.tag}
                         </span>
                     )}
                 </div>
 
-                <div>
-                    <p className="uppercase tracking-[0.3em] text-sm text-neutral-500 mb-4">
-                        Eben Studios
-                    </p>
+                <div className="lg:col-span-5 lg:sticky lg:top-28 self-start">
+                    <p className="eyebrow mb-3">Eben Studios</p>
+                    <h1 className="display mb-6">{product.name}</h1>
 
-                    <h1 className="text-4xl md:text-5xl font-black uppercase leading-none mb-6">
-                        {product.name}
-                    </h1>
-
-                    <p className="text-2xl font-semibold mb-6">
+                    <p className="text-3xl font-bold mb-8">
                         R {Number(product.price).toLocaleString()}
                     </p>
 
                     {product.description && (
-                        <p className="text-neutral-600 leading-relaxed mb-6">
-                            {product.description}
-                        </p>
+                        <p className="text-lg text-ink-soft max-w-prose mb-8">{product.description}</p>
                     )}
 
-                    <p className={`text-sm font-semibold mb-8 ${product.stock > 0 ? "text-green-600" : "text-red-600"}`}>
-                        {product.stock > 0 ? `In Stock (${product.stock} available)` : "Out of Stock"}
+                    <p className={`font-bold mb-8 ${inStock ? "text-ink" : "field-error"}`}>
+                        {inStock ? `In stock, ${product.stock} available` : "Sold out"}
                     </p>
 
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        <button
-                            onClick={handleAddToCart}
-                            disabled={product.stock === 0}
-                            className="bg-black text-white px-8 py-4 rounded-full font-semibold hover:bg-neutral-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {added ? "Added to Cart" : "Add to Cart"}
-                        </button>
+                    <Button onClick={handleAddToCart} disabled={!inStock} className="w-full sm:w-auto">
+                        {added ? "Added to cart" : "Add to cart"}
+                    </Button>
 
-                        <Button variant="outline" to="/shop">
-                            Back to Shop
-                        </Button>
-                    </div>
+                    <p role="status" className="sr-only">{added ? `${product.name} added to cart` : ""}</p>
                 </div>
             </div>
         </section>

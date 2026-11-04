@@ -1,37 +1,30 @@
 import { Link } from "react-router-dom";
 
-export default function Button({
-                                   children,
-                                   variant = "primary",
-                                   to,
-                                   ...props
-                               }) {
-    const baseStyles =
-        "inline-block px-8 py-4 rounded-full font-semibold transition duration-300";
+const baseStyles =
+    "inline-flex items-center justify-center gap-3 whitespace-nowrap min-h-12 px-8 rounded-full font-semibold border transition-colors duration-200 disabled:opacity-60";
 
-    const variants = {
-        primary:
-            "bg-white text-black hover:bg-neutral-200",
+const variants = {
+    // One black pill per section.
+    primary: "bg-black border-black text-white hover:bg-neutral-700 hover:border-neutral-700",
+    secondary: "bg-transparent border-black/30 text-black hover:bg-black hover:text-white hover:border-black",
+    outline: "bg-transparent border-black/30 text-black hover:bg-black hover:text-white hover:border-black",
+    // For dark or photographic backgrounds.
+    inverse: "bg-white border-white text-black hover:bg-neutral-200 hover:border-neutral-200",
+};
 
-        secondary:
-            "border border-white/40 text-white backdrop-blur-md hover:bg-white hover:text-black",
-
-        outline:
-            "border border-black/20 text-black hover:bg-black hover:text-white",
-    };
-
-    const className = `${baseStyles} ${variants[variant]}`;
+export default function Button({ children, variant = "primary", to, className = "", ...props }) {
+    const classes = `${baseStyles} ${variants[variant]} ${className}`;
 
     if (to) {
         return (
-            <Link to={to} className={className} {...props}>
+            <Link to={to} className={classes} {...props}>
                 {children}
             </Link>
         );
     }
 
     return (
-        <button className={className} {...props}>
+        <button className={classes} {...props}>
             {children}
         </button>
     );

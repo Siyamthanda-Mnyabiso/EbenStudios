@@ -4,6 +4,8 @@ import { useAuth } from "../hooks/useAuth";
 import { useCart } from "../hooks/useCart";
 import { createOrder } from "../service/orderService";
 import Button from "../components/ui/Button";
+import Input from "../components/ui/Input";
+import PageHeader from "../components/ui/PageHeader";
 
 export default function Checkout() {
     const { user, loading: authLoading } = useAuth();
@@ -26,18 +28,10 @@ export default function Checkout() {
 
     if (items.length === 0) {
         return (
-            <section className="max-w-7xl mx-auto px-6 lg:px-10 py-16 text-center">
-                <p className="uppercase tracking-[0.3em] text-sm text-neutral-500 mb-4">
-                    Checkout
-                </p>
-
-                <h1 className="text-4xl md:text-5xl font-black uppercase leading-none mb-6">
-                    Your Cart Is Empty
-                </h1>
-
-                <Button variant="outline" to="/shop">
-                    Continue Shopping
-                </Button>
+            <section className="page page-section">
+                <PageHeader eyebrow="Checkout" title="Checkout" />
+                <h2 className="title mb-6">Your cart is empty</h2>
+                <Button to="/shop">Continue shopping</Button>
             </section>
         );
     }
@@ -56,91 +50,53 @@ export default function Checkout() {
             clearCart();
             navigate("/orders", { state: { justOrderedId: order.id } });
         } catch (err) {
-            setError(err.response?.data?.message || "Something went wrong. Please try again.");
+            setError(err.message || "Something went wrong. Please try again.");
         } finally {
             setSubmitting(false);
         }
     }
 
     return (
-        <section className="max-w-7xl mx-auto px-6 lg:px-10 py-16">
-            <p className="uppercase tracking-[0.3em] text-sm text-neutral-500 mb-4">
-                Checkout
-            </p>
+        <section className="page page-section">
+            <PageHeader eyebrow="Almost there" title="Checkout" />
 
-            <h1 className="text-4xl md:text-5xl font-black uppercase leading-none mb-10">
-                Checkout
-            </h1>
+            <div className="grid lg:grid-cols-12 gap-12">
+                <form onSubmit={handleSubmit} className="lg:col-span-7 flex flex-col gap-6">
+                    <h2 className="title">Delivery address</h2>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                <form onSubmit={handleSubmit} className="lg:col-span-2 flex flex-col gap-4">
-                    <h2 className="font-bold text-lg mb-2">Shipping Details</h2>
+                    {error && <p role="alert" className="field-error">{error}</p>}
 
-                    {error && (
-                        <p className="text-sm text-red-600">{error}</p>
-                    )}
+                    <Input label="Street address" type="text" autoComplete="street-address" value={address} onChange={(e) => setAddress(e.target.value)} />
 
-                    <input
-                        type="text"
-                        required
-                        placeholder="Street Address"
-                        value={address}
-                        onChange={(e) => setAddress(e.target.value)}
-                        className="rounded-full px-6 py-4 border border-black/10 bg-white focus:outline-none"
-                    />
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <input
-                            type="text"
-                            required
-                            placeholder="City"
-                            value={city}
-                            onChange={(e) => setCity(e.target.value)}
-                            className="rounded-full px-6 py-4 border border-black/10 bg-white focus:outline-none"
-                        />
-
-                        <input
-                            type="text"
-                            required
-                            placeholder="Postal Code"
-                            value={postalCode}
-                            onChange={(e) => setPostalCode(e.target.value)}
-                            className="rounded-full px-6 py-4 border border-black/10 bg-white focus:outline-none"
-                        />
+                    <div className="grid sm:grid-cols-2 gap-6">
+                        <Input label="City" type="text" autoComplete="address-level2" value={city} onChange={(e) => setCity(e.target.value)} />
+                        <Input label="Postal code" type="text" autoComplete="postal-code" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} />
                     </div>
 
-                    <button
-                        type="submit"
-                        disabled={submitting}
-                        className="bg-black text-white rounded-full py-4 font-semibold hover:bg-neutral-800 transition disabled:opacity-50 mt-2"
-                    >
-                        {submitting ? "Placing Order..." : `Place Order — R ${Number(subtotal).toLocaleString()}`}
-                    </button>
+                    <div>
+                        <Button type="submit" disabled={submitting}>
+                            {submitting ? "Placing order" : `Place order, R ${Number(subtotal).toLocaleString()}`}
+                        </Button>
+                    </div>
                 </form>
 
-                <div className="bg-white rounded-3xl p-6 border border-black/5 shadow-sm h-fit">
-                    <h2 className="font-bold text-lg mb-6">Order Summary</h2>
+                <aside className="lg:col-span-5 h-fit bg-paper-deep p-8" aria-labelledby="summary-heading">
+                    <h2 id="summary-heading" className="title mb-6">Order summary</h2>
 
-                    <div className="flex flex-col gap-4 mb-6">
+                    <ul className="flex flex-col gap-3 mb-6">
                         {items.map((item) => (
-                            <div key={item.id} className="flex items-center justify-between text-sm">
-                                <span className="text-neutral-600">
-                                    {item.name} × {item.quantity}
-                                </span>
-                                <span className="font-semibold">
-                                    R {Number(item.price * item.quantity).toLocaleString()}
-                                </span>
-                            </div>
+                            <li key={item.id} className="flex items-baseline justify-between gap-4">
+                                <span className="text-ink-soft">{item.name} x {item.quantity}</span>
+                                <span className="font-bold">R {Number(item.price * item.quantity).toLocaleString()}</span>
+                            </li>
                         ))}
-                    </div>
+                    </ul>
 
-                    <div className="flex items-center justify-between border-t border-black/5 pt-4 text-neutral-600">
+                    <div className="flex items-baseline justify-between border-t border-ink pt-4">
                         <span>Subtotal</span>
-                        <span className="font-semibold text-black">
-                            R {Number(subtotal).toLocaleString()}
-                        </span>
+                        <span className="text-3xl font-bold">R {Number(subtotal).toLocaleString()}</span>
                     </div>
-                </div>
+                </aside>
             </div>
         </section>
     );

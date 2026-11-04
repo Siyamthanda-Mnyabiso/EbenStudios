@@ -15,7 +15,7 @@ export default function Dashboard() {
                 setProducts(productsData);
                 setOrders(ordersData);
             })
-            .catch((err) => setError(err.response?.data?.message || "Failed to load dashboard data."))
+            .catch((err) => setError(err.message || "Failed to load dashboard data."))
             .finally(() => setLoading(false));
     }, []);
 
@@ -31,23 +31,23 @@ export default function Dashboard() {
 
     return (
         <div>
-            <h1 className="text-3xl font-black uppercase leading-none mb-8">
+            <h1 className="headline mb-8">
                 Dashboard
             </h1>
 
             {error && (
-                <p className="text-sm text-red-600 mb-4">{error}</p>
+                <p className="field-error mb-4">{error}</p>
             )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
                 {stats.map(({ label, value, icon: Icon }) => (
                     <div
                         key={label}
-                        className="bg-white rounded-3xl p-6 border border-black/5 shadow-sm"
+                        className="bg-white p-6 border border-line shadow-sm"
                     >
                         <div className="flex items-center justify-between mb-6">
-                            <span className="text-sm text-neutral-500">{label}</span>
-                            <Icon size={18} className="text-neutral-400" />
+                            <span className="text-sm text-mute">{label}</span>
+                            <Icon size={18} className="text-mute" />
                         </div>
 
                         <p className="text-2xl font-bold">{loading ? "..." : value}</p>
@@ -55,18 +55,18 @@ export default function Dashboard() {
                 ))}
             </div>
 
-            <div className="bg-white rounded-3xl border border-black/5 shadow-sm overflow-hidden">
+            <div className="bg-white border border-line overflow-hidden">
                 {loading ? (
-                    <p className="p-8 text-center text-neutral-500">Loading recent orders...</p>
+                    <p className="p-8 text-center text-mute">Loading recent orders</p>
                 ) : orders.length === 0 ? (
-                    <p className="p-8 text-neutral-500">
+                    <p className="p-8 text-mute">
                         No recent activity yet. Orders will show up here once customers
                         start checking out.
                     </p>
                 ) : (
                     <table className="w-full text-left">
                         <thead>
-                            <tr className="border-b border-black/5 text-sm text-neutral-500">
+                            <tr className="border-b border-line text-sm text-mute">
                                 <th className="px-6 py-4 font-medium">Order</th>
                                 <th className="px-6 py-4 font-medium">Customer</th>
                                 <th className="px-6 py-4 font-medium">Total</th>
@@ -75,10 +75,10 @@ export default function Dashboard() {
 
                         <tbody>
                             {orders.slice(0, 5).map((order) => (
-                                <tr key={order.id} className="border-b border-black/5 last:border-0">
+                                <tr key={order.id} className="border-b border-line last:border-0">
                                     <td className="px-6 py-4 font-semibold">#EB-{order.id}</td>
-                                    <td className="px-6 py-4 text-neutral-600">{order.user?.name}</td>
-                                    <td className="px-6 py-4 text-neutral-600">
+                                    <td className="px-6 py-4 text-ink-soft">{order.user?.name}</td>
+                                    <td className="px-6 py-4 text-ink-soft">
                                         R {Number(order.total).toLocaleString()}
                                     </td>
                                 </tr>

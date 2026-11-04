@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getProducts } from "../service/productService";
+import Reveal from "../components/ui/Reveal";
 import ProductGrid from "../components/products/ProductGrid";
 
 export default function Shop() {
@@ -10,38 +11,36 @@ export default function Shop() {
     useEffect(() => {
         getProducts()
             .then(setProducts)
-            .catch((err) => setError(err.response?.data?.message || "Failed to load products."))
+            .catch((err) => setError(err.message || "Failed to load products."))
             .finally(() => setLoading(false));
     }, []);
 
     return (
-        <section className="max-w-7xl mx-auto px-6 lg:px-10 py-16">
-            <p className="uppercase tracking-[0.3em] text-sm text-neutral-500 mb-4">
-                All Products
-            </p>
+        <section className="page pt-6 pb-16">
+            <Reveal className="flex items-end justify-between gap-6 border-y border-black py-5 mb-8">
+                <h1 className="display">Shop</h1>
 
-            <h1 className="text-4xl md:text-5xl font-black uppercase leading-none mb-10">
-                Shop
-            </h1>
+                {!loading && !error && (
+                    <p className="display" aria-label={`${products.length} products`}>
+                        {products.length}
+                    </p>
+                )}
+            </Reveal>
 
-            {loading && (
-                <p className="text-neutral-500">Loading products...</p>
-            )}
+            {loading && <p role="status" className="text-ink-soft">Loading products</p>}
 
-            {error && (
-                <p className="text-red-600">{error}</p>
-            )}
+            {error && <p role="alert" className="field-error">{error}</p>}
 
             {!loading && !error && products.length === 0 && (
-                <p className="text-neutral-600 max-w-2xl">
-                    No products available yet. Check back shortly for the
-                    latest Eben Studios drops.
-                </p>
+                <div className="border border-line bg-white p-10 max-w-2xl">
+                    <h2 className="title mb-2">Nothing here yet</h2>
+                    <p className="text-ink-soft">
+                        New pieces are on the way. Check back soon for the latest Eben Studios drops.
+                    </p>
+                </div>
             )}
 
-            {!loading && !error && products.length > 0 && (
-                <ProductGrid products={products} />
-            )}
+            {!loading && !error && products.length > 0 && <ProductGrid products={products} />}
         </section>
     );
 }

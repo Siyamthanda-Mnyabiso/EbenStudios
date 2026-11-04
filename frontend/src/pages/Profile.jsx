@@ -1,5 +1,7 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import Button from "../components/ui/Button";
+import PageHeader from "../components/ui/PageHeader";
 
 export default function Profile() {
     const { user, loading, logout } = useAuth();
@@ -13,28 +15,22 @@ export default function Profile() {
     }
 
     return (
-        <section className="max-w-7xl mx-auto px-6 lg:px-10 py-16">
-            <p className="uppercase tracking-[0.3em] text-sm text-neutral-500 mb-4">
-                Account
-            </p>
+        <section className="page page-section">
+            <PageHeader eyebrow="Account" title={user.name || "Your account"} />
 
-            <h1 className="text-4xl md:text-5xl font-black uppercase leading-none mb-6">
-                Profile
-            </h1>
+            <dl className="max-w-md border-t border-line mb-10">
+                <div className="py-4 border-b border-line">
+                    <dt className="eyebrow mb-1">Email</dt>
+                    <dd className="font-medium">{user.email}</dd>
+                </div>
+            </dl>
 
-            <div className="bg-white rounded-3xl p-6 border border-black/5 shadow-sm max-w-md">
-                <p className="text-sm text-neutral-500 mb-1">Name</p>
-                <p className="font-semibold mb-4">{user.name}</p>
-
-                <p className="text-sm text-neutral-500 mb-1">Email</p>
-                <p className="font-semibold mb-6">{user.email}</p>
-
-                <button
-                    onClick={logout}
-                    className="text-sm font-semibold text-red-600 hover:text-red-700 transition"
-                >
-                    Log Out
-                </button>
+            <div className="flex flex-col sm:flex-row gap-4">
+                <Button to="/orders">View orders</Button>
+                {user.role === "ADMIN" && (
+                    <Button variant="secondary" to="/admin">Admin dashboard</Button>
+                )}
+                <Button variant="secondary" onClick={logout}>Log out</Button>
             </div>
         </section>
     );
