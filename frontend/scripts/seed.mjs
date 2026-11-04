@@ -38,11 +38,12 @@ async function ensureAdmin() {
 }
 
 async function seedProducts() {
+    // Placeholders based on the items visible on the brand's Instagram. Replace in the admin.
+    const description = "Placeholder product. Replace the name, price and photo in the admin.";
     const products = [
-        { name: "Woodstock Hoodie", price: 1199, stock: 24, tag: "New" },
-        { name: "Streets Tee", price: 549, stock: 58, tag: "Best Seller" },
-        { name: "Culture Bomber", price: 2399, stock: 6, tag: "Limited" },
-        { name: "Movement Cap", price: 399, stock: 40, tag: "New" },
+        { name: "White tee", description, price: 549, stock: 10, tag: "Placeholder" },
+        { name: "Red pants", description, price: 799, stock: 10, tag: "Placeholder" },
+        { name: "Cap", description, price: 399, stock: 10, tag: "Placeholder" },
     ];
 
     const { error } = await supabase.from("products").upsert(products, { onConflict: "name", ignoreDuplicates: true });
