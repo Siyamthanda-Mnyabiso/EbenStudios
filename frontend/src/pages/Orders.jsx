@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import { Link, Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { getMyOrders } from "../service/orderService";
 import Button from "../components/ui/Button";
@@ -38,7 +38,9 @@ export default function Orders() {
 
             {location.state?.justOrderedId && (
                 <p role="status" className="border-l-4 border-ember bg-paper-deep px-6 py-4 mb-10 font-bold">
-                    Order #EB-{location.state.justOrderedId} placed. Thank you!
+                    {location.state.paid
+                        ? `Payment received for order #EB-${location.state.justOrderedId}. Thank you!`
+                        : `Order #EB-${location.state.justOrderedId} placed. Thank you!`}
                 </p>
             )}
 
@@ -64,6 +66,13 @@ export default function Orders() {
                                 <p className="mt-3 inline-block border border-ink px-3 py-1 font-bold text-sm">
                                     {order.status}
                                 </p>
+                                {order.status === "Pending" && (
+                                    <p className="mt-3">
+                                        <Link to={`/pay/${order.id}`} className="font-bold text-ember underline underline-offset-4">
+                                            Pay now
+                                        </Link>
+                                    </p>
+                                )}
                             </div>
 
                             <ul className="lg:col-span-6 flex flex-col gap-2">
