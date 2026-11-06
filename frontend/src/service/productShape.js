@@ -11,6 +11,7 @@ export function toProductShape(row) {
         price: Number(row.price),
         stock: row.stock,
         tag: row.tag,
+        category: row.category ?? null,
         sizes: row.sizes ?? [],
         colors: row.colors ?? [],
         imageUrl: row.image_url,

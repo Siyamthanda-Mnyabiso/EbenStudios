@@ -1,6 +1,8 @@
 import PageHeader from "../components/ui/PageHeader";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
 export default function Contact() {
+    useDocumentTitle("Contact");
     return (
         <section className="page page-section">
             <PageHeader eyebrow="Get in touch" title="Contact us" />

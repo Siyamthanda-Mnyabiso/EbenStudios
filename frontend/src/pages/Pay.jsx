@@ -7,10 +7,12 @@ import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 import PageHeader from "../components/ui/PageHeader";
 import { describeOptions } from "../lib/productOptions";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
 // Simulated card payment. The card details stay in this component: only the
 // order id is sent to the database once a test card is accepted.
 export default function Pay() {
+    useDocumentTitle("Payment");
     const { id } = useParams();
     const { user, loading: authLoading } = useAuth();
     const location = useLocation();

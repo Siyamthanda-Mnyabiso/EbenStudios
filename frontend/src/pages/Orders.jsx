@@ -5,8 +5,10 @@ import { getMyOrders } from "../service/orderService";
 import Button from "../components/ui/Button";
 import PageHeader from "../components/ui/PageHeader";
 import { describeOptions } from "../lib/productOptions";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
 export default function Orders() {
+    useDocumentTitle("Your orders");
     const { user, loading: authLoading } = useAuth();
     const location = useLocation();
     const [orders, setOrders] = useState([]);

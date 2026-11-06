@@ -1,6 +1,8 @@
 import Button from "../components/ui/Button";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
 export default function NotFound() {
+    useDocumentTitle("Page not found");
     return (
         <section className="page page-section">
             <p className="eyebrow mb-3">Error 404</p>

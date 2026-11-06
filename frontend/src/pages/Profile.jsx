@@ -2,8 +2,10 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import Button from "../components/ui/Button";
 import PageHeader from "../components/ui/PageHeader";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
 export default function Profile() {
+    useDocumentTitle("Your account");
     const location = useLocation();
     const { user, loading, logout } = useAuth();
 

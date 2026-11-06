@@ -3,8 +3,10 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
+import { useDocumentTitle } from "../../hooks/useDocumentTitle";
 
 export default function AdminLogin() {
+    useDocumentTitle("Admin log in");
     const { user, loading, login, logout } = useAuth();
     const navigate = useNavigate();
     const [email, setEmail] = useState("");

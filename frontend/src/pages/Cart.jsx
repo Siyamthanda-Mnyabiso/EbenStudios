@@ -6,10 +6,12 @@ import { getProductImage } from "../lib/productImage";
 import Button from "../components/ui/Button";
 import { describeOptions } from "../lib/productOptions";
 import PageHeader from "../components/ui/PageHeader";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
 const qtyButton = "inline-flex items-center justify-center w-12 h-12 hover:text-ember transition-colors";
 
 export default function Cart() {
+    useDocumentTitle("Cart");
     const { items, updateQuantity, removeFromCart, subtotal } = useCart();
     const { problems, hasProblems, error: checkError } = useCartCheck();
 

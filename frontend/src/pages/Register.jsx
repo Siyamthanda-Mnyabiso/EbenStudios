@@ -3,8 +3,10 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
 export default function Register() {
+    useDocumentTitle("Create account");
     const { register } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
