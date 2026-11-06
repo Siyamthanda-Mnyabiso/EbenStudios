@@ -27,7 +27,7 @@ export default function AdminLogin() {
             if (loggedInUser.role === "ADMIN") {
                 navigate("/admin");
             } else {
-                logout();
+                await logout();
                 setError("This account does not have admin access.");
             }
         } catch (err) {

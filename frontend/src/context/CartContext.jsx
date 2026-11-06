@@ -63,6 +63,28 @@ export function CartProvider({ children }) {
         setItems((current) => current.filter((item) => item.key !== key));
     }
 
+    // Brings saved lines up to date with the database (prices change, photos get replaced).
+    function refreshFromProducts(products) {
+        const byId = new Map(products.map((product) => [product.id, product]));
+
+        setItems((current) => {
+            let changed = false;
+
+            const next = current.map((item) => {
+                const product = byId.get(item.id);
+
+                if (!product || (product.price === item.price && product.name === item.name && product.imageUrl === item.imageUrl)) {
+                    return item;
+                }
+
+                changed = true;
+                return { ...item, price: product.price, name: product.name, imageUrl: product.imageUrl };
+            });
+
+            return changed ? next : current;
+        });
+    }
+
     function clearCart() {
         setItems([]);
     }
@@ -72,7 +94,7 @@ export function CartProvider({ children }) {
 
     return (
         <CartContext.Provider
-            value={{ items, addToCart, updateQuantity, removeFromCart, clearCart, itemCount, subtotal }}
+            value={{ items, addToCart, updateQuantity, removeFromCart, refreshFromProducts, clearCart, itemCount, subtotal }}
         >
             {children}
         </CartContext.Provider>
