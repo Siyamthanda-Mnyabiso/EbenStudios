@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
@@ -7,6 +7,9 @@ import Input from "../components/ui/Input";
 export default function Login() {
     const { login } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
+    // Set by pages that need a login, so the visitor lands back where they were going.
+    const from = location.state?.from ?? "/";
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
@@ -19,7 +22,7 @@ export default function Login() {
 
         try {
             await login(email, password);
-            navigate("/");
+            navigate(from, { replace: true });
         } catch (err) {
             setError(err.message || "Something went wrong. Please try again.");
         } finally {
@@ -48,7 +51,7 @@ export default function Login() {
 
                 <p className="text-ink-soft mt-8">
                     New to Eben Studios?{" "}
-                    <Link to="/register" className="font-bold text-ember underline underline-offset-4">
+                    <Link to="/register" state={{ from }} className="font-bold text-ember underline underline-offset-4">
                         Create an account
                     </Link>
                 </p>

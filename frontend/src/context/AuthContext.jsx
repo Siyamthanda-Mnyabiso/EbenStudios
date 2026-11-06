@@ -23,7 +23,8 @@ export function AuthProvider({ children }) {
         const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
             if (event === "SIGNED_OUT" || !session) {
                 setUser(null);
-            } else if (event === "TOKEN_REFRESHED" || event === "USER_UPDATED") {
+            } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "USER_UPDATED") {
+                // SIGNED_IN covers logins in another tab and returning from the email confirmation link.
                 // Deferred: awaiting Supabase calls inside this callback can deadlock the auth client.
                 setTimeout(() => getProfile(session.user.id).then(setUser).catch(() => {}), 0);
             }
