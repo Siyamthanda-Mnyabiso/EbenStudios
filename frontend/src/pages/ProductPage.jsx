@@ -73,6 +73,17 @@ export default function ProductPage() {
         );
     }
 
+    // Old links and saved carts can still point at a product that has been taken off sale.
+    if (product.archived) {
+        return (
+            <section className="page page-section">
+                <p className="eyebrow mb-3">{product.name}</p>
+                <h1 className="headline mb-8">This product is no longer available</h1>
+                <Button variant="secondary" to="/shop">Back to shop</Button>
+            </section>
+        );
+    }
+
     const inStock = product.stock > 0;
 
     return (
