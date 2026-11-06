@@ -1,0 +1,4 @@
+# Netlify: serve the React app for every route so a refresh or a shared link to
+# /shop, /products/1 or /admin works. Real files (images, scripts) are served first.
+# (Cloudflare Pages does this automatically and ignores this rule.)
+/*    /index.html   200
