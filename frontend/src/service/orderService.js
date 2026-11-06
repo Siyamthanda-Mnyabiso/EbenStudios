@@ -63,3 +63,14 @@ export async function updateOrderStatus(id, status) {
     const row = unwrap(await supabase.from("orders").select(ORDER_SELECT).eq("id", id).single());
     return toOrder(row);
 }
+
+// One of the signed-in customer's orders (RLS hides everyone else's), or null.
+export async function getMyOrder(id) {
+    const row = unwrap(await supabase.from("orders").select(ORDER_SELECT).eq("id", id).maybeSingle());
+    return row ? toOrder(row) : null;
+}
+
+// Test mode: marks a Pending order as Paid once the browser has accepted a test card.
+export async function payOrder(id) {
+    return unwrap(await supabase.rpc("pay_order", { order_id: id }));
+}

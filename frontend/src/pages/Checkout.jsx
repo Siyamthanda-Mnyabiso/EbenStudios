@@ -56,7 +56,7 @@ export default function Checkout() {
                 shippingAddress: `${address}, ${city}, ${postalCode}`,
             });
 
-            navigate("/orders", { state: { justOrderedId: order.id } });
+            navigate(`/pay/${order.id}`);
             clearCart();
         } catch (err) {
             setError(err.message || "Something went wrong. Please try again.");
@@ -90,7 +90,7 @@ export default function Checkout() {
 
                     <div>
                         <Button type="submit" disabled={submitting || checking || hasProblems}>
-                            {submitting ? "Placing order" : `Place order, R ${Number(subtotal).toLocaleString()}`}
+                            {submitting ? "Placing order" : `Continue to payment, R ${Number(subtotal).toLocaleString()}`}
                         </Button>
                     </div>
                 </form>
