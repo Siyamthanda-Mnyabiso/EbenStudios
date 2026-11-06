@@ -1,7 +1,7 @@
 // What stops a cart line from being ordered, or null when it is fine.
 // `quantityOfProduct` is the total across every line of the same product, because stock is shared.
 export function lineProblem(item, product, quantityOfProduct) {
-    if (!product) {
+    if (!product || product.archived) {
         return { message: "No longer available", fixable: false };
     }
 

@@ -14,6 +14,7 @@ export function toProductShape(row) {
         sizes: row.sizes ?? [],
         colors: row.colors ?? [],
         imageUrl: row.image_url,
+        archived: row.archived ?? false,
         createdAt: row.created_at,
     };
 }

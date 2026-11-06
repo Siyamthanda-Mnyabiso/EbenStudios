@@ -2,12 +2,15 @@ import { supabase, unwrap, PRODUCT_IMAGE_BUCKET } from "./supabase";
 import { toProductShape as toProduct } from "./productShape";
 import { parseList } from "../lib/productOptions";
 
-export async function getProducts() {
-    const rows = unwrap(
-        await supabase.from("products").select("*").order("created_at", { ascending: false })
-    );
+// The shop only lists products on sale. The admin passes includeArchived to see everything.
+export async function getProducts({ includeArchived = false } = {}) {
+    let query = supabase.from("products").select("*").order("created_at", { ascending: false });
 
-    return rows.map(toProduct);
+    if (!includeArchived) {
+        query = query.eq("archived", false);
+    }
+
+    return unwrap(await query).map(toProduct);
 }
 
 export async function getProduct(id) {
@@ -53,6 +56,15 @@ function toRow({ name, description, price, stock, tag, sizes, colors }) {
     };
 }
 
+// Turns database errors into messages an admin can act on.
+function friendlySaveError(err) {
+    if (err.code === "23505") {
+        return new Error("A product with this name already exists. If it is archived, restore it instead.");
+    }
+
+    return err;
+}
+
 export async function createProduct({ image, ...fields }) {
     const row = toRow(fields);
 
@@ -60,7 +72,11 @@ export async function createProduct({ image, ...fields }) {
         row.image_url = await uploadImage(image);
     }
 
-    return toProduct(unwrap(await supabase.from("products").insert(row).select().single()));
+    try {
+        return toProduct(unwrap(await supabase.from("products").insert(row).select().single()));
+    } catch (err) {
+        throw friendlySaveError(err);
+    }
 }
 
 export async function updateProduct(id, { image, ...fields }) {
@@ -73,20 +89,34 @@ export async function updateProduct(id, { image, ...fields }) {
         row.image_url = await uploadImage(image);
     }
 
-    const product = toProduct(
-        unwrap(await supabase.from("products").update(row).eq("id", id).select().single())
-    );
+    let product;
+
+    try {
+        product = toProduct(unwrap(await supabase.from("products").update(row).eq("id", id).select().single()));
+    } catch (err) {
+        throw friendlySaveError(err);
+    }
 
     await deleteImage(previousUrl);
 
     return product;
 }
 
+// Deletes the product, or archives it when it has been ordered (the database decides).
+// Returns "deleted" or "archived". The photo is only removed when the product is really gone.
 export async function deleteProduct(id) {
     const row = unwrap(await supabase.from("products").select("image_url").eq("id", id).maybeSingle());
+    const result = unwrap(await supabase.rpc("delete_product", { product_id: id }));
 
-    unwrap(await supabase.from("products").delete().eq("id", id));
-    await deleteImage(row?.image_url);
+    if (result === "deleted") {
+        await deleteImage(row?.image_url);
+    }
+
+    return result;
+}
+
+export async function restoreProduct(id) {
+    unwrap(await supabase.from("products").update({ archived: false }).eq("id", id));
 }
 
 // Fresh data for the products in a cart, so stock, price and options are checked before checkout.

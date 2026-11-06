@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { Plus, Pencil, Trash2, X, Upload } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Upload, RotateCcw } from "lucide-react";
 import {
     getProducts,
     createProduct,
     updateProduct,
     deleteProduct,
+    restoreProduct,
 } from "../../service/productService";
 import Input from "../../components/ui/Input";
 import { getProductImage } from "../../lib/productImage";
@@ -26,6 +27,11 @@ export default function Products() {
 
     const [confirmDeleteId, setConfirmDeleteId] = useState(null);
     const [deletingId, setDeletingId] = useState(null);
+    const [restoringId, setRestoringId] = useState(null);
+    const [notice, setNotice] = useState("");
+
+    const activeProducts = products.filter((product) => !product.archived);
+    const archivedProducts = products.filter((product) => product.archived);
 
     const previewUrl = useMemo(
         () => (imageFile ? URL.createObjectURL(imageFile) : null),
@@ -49,7 +55,7 @@ export default function Products() {
         setError("");
 
         try {
-            setProducts(await getProducts());
+            setProducts(await getProducts({ includeArchived: true }));
         } catch (err) {
             setError(err.message || "Failed to load products.");
         } finally {
@@ -110,17 +116,40 @@ export default function Products() {
         }
     }
 
-    async function handleDelete(id) {
-        setDeletingId(id);
+    async function handleDelete(product) {
+        setDeletingId(product.id);
+        setError("");
+        setNotice("");
 
         try {
-            await deleteProduct(id);
+            const result = await deleteProduct(product.id);
             setConfirmDeleteId(null);
+            setNotice(
+                result === "archived"
+                    ? `"${product.name}" has been ordered before, so it was archived instead of deleted. It is hidden from the shop and still shows in past orders. You can restore it below.`
+                    : `"${product.name}" was deleted.`
+            );
             await loadProducts();
         } catch (err) {
             setError(err.message || "Failed to delete product.");
         } finally {
             setDeletingId(null);
+        }
+    }
+
+    async function handleRestore(product) {
+        setRestoringId(product.id);
+        setError("");
+        setNotice("");
+
+        try {
+            await restoreProduct(product.id);
+            setNotice(`"${product.name}" is back in the shop.`);
+            await loadProducts();
+        } catch (err) {
+            setError(err.message || "Failed to restore product.");
+        } finally {
+            setRestoringId(null);
         }
     }
 
@@ -158,7 +187,7 @@ export default function Products() {
                     </div>
 
                     {formError && (
-                        <p className="field-error mb-4">{formError}</p>
+                        <p role="alert" className="field-error mb-4">{formError}</p>
                     )}
 
                     <div className="flex items-center gap-4 mb-4">
@@ -228,10 +257,14 @@ export default function Products() {
             )}
 
             {error && (
-                <p className="field-error mb-4">{error}</p>
+                <p role="alert" className="field-error mb-4">{error}</p>
             )}
 
-            <div className="bg-white border border-line overflow-hidden">
+            {notice && (
+                <p role="status" className="border-l-4 border-ember bg-paper-deep px-6 py-4 mb-4 font-medium">{notice}</p>
+            )}
+
+            <div className="bg-white border border-line overflow-x-auto">
                 <table className="w-full text-left">
                     <thead>
                         <tr className="border-b border-line text-sm text-mute">
@@ -252,7 +285,7 @@ export default function Products() {
                             </tr>
                         )}
 
-                        {!loading && products.length === 0 && (
+                        {!loading && activeProducts.length === 0 && (
                             <tr>
                                 <td colSpan={5} className="px-6 py-8 text-center text-mute">
                                     No products yet.
@@ -260,7 +293,7 @@ export default function Products() {
                             </tr>
                         )}
 
-                        {!loading && products.map((product) => (
+                        {!loading && activeProducts.map((product) => (
                             <tr key={product.id} className="border-b border-line last:border-0">
                                 <td className="px-6 py-4">
                                     <img
@@ -286,7 +319,7 @@ export default function Products() {
                                         <div className="flex items-center justify-end gap-3 text-sm">
                                             <span className="text-mute">Delete?</span>
                                             <button
-                                                onClick={() => handleDelete(product.id)}
+                                                onClick={() => handleDelete(product)}
                                                 disabled={deletingId === product.id}
                                                 className="inline-flex items-center min-h-12 px-2 font-bold text-danger hover:underline disabled:opacity-60"
                                             >
@@ -310,8 +343,8 @@ export default function Products() {
                                             </button>
                                             <button
                                                 onClick={() => setConfirmDeleteId(product.id)}
-                                                className="hover:text-danger transition"
-                                                aria-label="Delete"
+                                                className="inline-flex items-center justify-center w-12 h-12 hover:text-danger transition-colors"
+                                                aria-label={`Delete ${product.name}`}
                                             >
                                                 <Trash2 size={16} />
                                             </button>
@@ -323,6 +356,36 @@ export default function Products() {
                     </tbody>
                 </table>
             </div>
+
+            {!loading && archivedProducts.length > 0 && (
+                <section aria-labelledby="archived-heading" className="mt-12">
+                    <h2 id="archived-heading" className="font-bold text-lg mb-1">
+                        Archived ({archivedProducts.length})
+                    </h2>
+                    <p className="text-mute mb-4">Hidden from the shop because they appear in past orders.</p>
+
+                    <ul className="bg-white border border-line">
+                        {archivedProducts.map((product) => (
+                            <li key={product.id} className="flex items-center gap-4 px-6 py-3 border-b border-line last:border-0">
+                                <img src={getProductImage(product)} alt="" className="w-12 h-12 object-cover opacity-60 shrink-0" />
+                                <div className="flex-1 min-w-0">
+                                    <p className="font-semibold truncate">{product.name}</p>
+                                    <p className="text-sm text-mute">R {Number(product.price).toLocaleString()} · {product.stock} in stock</p>
+                                </div>
+                                <button
+                                    onClick={() => handleRestore(product)}
+                                    disabled={restoringId === product.id}
+                                    aria-label={`Restore ${product.name}`}
+                                    className="inline-flex items-center gap-2 min-h-12 px-4 font-bold hover:text-ember transition-colors disabled:opacity-60"
+                                >
+                                    <RotateCcw size={16} aria-hidden="true" />
+                                    {restoringId === product.id ? "Restoring" : "Restore"}
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                </section>
+            )}
         </div>
     );
 }

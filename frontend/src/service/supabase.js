@@ -21,7 +21,10 @@ export const PRODUCT_IMAGE_BUCKET = "product-images";
 export function unwrap({ data, error }) {
     if (error) {
         // Without config every call hits the placeholder host and fails with "Failed to fetch".
-        throw new Error(isSupabaseConfigured ? error.message : NOT_CONFIGURED_MESSAGE);
+        const err = new Error(isSupabaseConfigured ? error.message : NOT_CONFIGURED_MESSAGE);
+        // Postgres error code (e.g. 23505 duplicate) so callers can show a friendlier message.
+        err.code = error.code;
+        throw err;
     }
 
     return data;
