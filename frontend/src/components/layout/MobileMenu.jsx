@@ -27,6 +27,7 @@ export default function MobileMenu({ isOpen, onClose }) {
         { to: "/contact", label: "Contact" },
         { to: "/orders", label: "Orders" },
         user ? { to: "/profile", label: "Account" } : { to: "/login", label: "Log in" },
+        ...(user?.role === "ADMIN" ? [{ to: "/admin", label: "Admin dashboard" }] : []),
     ];
 
     return (

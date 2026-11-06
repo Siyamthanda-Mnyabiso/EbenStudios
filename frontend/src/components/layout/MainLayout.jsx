@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom";
 import AnnouncementBar from "./AnnouncementBar";
+import AdminBar from "./AdminBar";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { isSupabaseConfigured, NOT_CONFIGURED_MESSAGE } from "../../service/supabase";
@@ -12,6 +13,7 @@ export default function MainLayout() {
                     {NOT_CONFIGURED_MESSAGE}
                 </p>
             )}
+            <AdminBar />
             <AnnouncementBar />
             <Navbar />
 
