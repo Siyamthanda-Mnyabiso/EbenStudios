@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
@@ -7,6 +7,9 @@ import Input from "../components/ui/Input";
 export default function Register() {
     const { register } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
+    // Set by pages that need a login, so the visitor lands back where they were going.
+    const from = location.state?.from ?? "/";
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -20,7 +23,7 @@ export default function Register() {
 
         try {
             await register(name, email, password);
-            navigate("/");
+            navigate(from, { replace: true });
         } catch (err) {
             setError(err.message || "Something went wrong. Please try again.");
         } finally {
@@ -58,7 +61,7 @@ export default function Register() {
 
                 <p className="text-ink-soft mt-8">
                     Already have an account?{" "}
-                    <Link to="/login" className="font-bold text-ember underline underline-offset-4">
+                    <Link to="/login" state={{ from }} className="font-bold text-ember underline underline-offset-4">
                         Log in
                     </Link>
                 </p>

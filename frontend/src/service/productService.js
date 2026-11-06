@@ -88,3 +88,13 @@ export async function deleteProduct(id) {
     unwrap(await supabase.from("products").delete().eq("id", id));
     await deleteImage(row?.image_url);
 }
+
+// Fresh data for the products in a cart, so stock, price and options are checked before checkout.
+export async function getProductsByIds(ids) {
+    if (ids.length === 0) {
+        return [];
+    }
+
+    const rows = unwrap(await supabase.from("products").select("*").in("id", ids));
+    return rows.map(toProduct);
+}

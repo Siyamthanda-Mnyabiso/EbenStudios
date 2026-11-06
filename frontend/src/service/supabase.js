@@ -12,12 +12,16 @@ if (!isSupabaseConfigured) {
 
 export const supabase = createClient(url || "https://placeholder.supabase.co", anonKey || "placeholder-key");
 
+export const NOT_CONFIGURED_MESSAGE =
+    "The shop is not connected to its database yet. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to frontend/.env and restart the dev server.";
+
 export const PRODUCT_IMAGE_BUCKET = "product-images";
 
 // Throws a plain Error carrying Supabase's message so pages can show err.message.
 export function unwrap({ data, error }) {
     if (error) {
-        throw new Error(error.message);
+        // Without config every call hits the placeholder host and fails with "Failed to fetch".
+        throw new Error(isSupabaseConfigured ? error.message : NOT_CONFIGURED_MESSAGE);
     }
 
     return data;

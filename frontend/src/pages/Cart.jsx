@@ -1,5 +1,7 @@
+import { Link } from "react-router-dom";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { useCart } from "../hooks/useCart";
+import { useCartCheck } from "../hooks/useCartCheck";
 import { getProductImage } from "../lib/productImage";
 import Button from "../components/ui/Button";
 import { describeOptions } from "../lib/productOptions";
@@ -9,6 +11,7 @@ const qtyButton = "inline-flex items-center justify-center w-12 h-12 hover:text-
 
 export default function Cart() {
     const { items, updateQuantity, removeFromCart, subtotal } = useCart();
+    const { problems, hasProblems, error: checkError } = useCartCheck();
 
     if (items.length === 0) {
         return (
@@ -40,6 +43,20 @@ export default function Cart() {
                                 <h2 className="title">{item.name}</h2>
                                 {describeOptions(item) && <p className="text-ink-soft">{describeOptions(item)}</p>}
                                 <p className="text-ink-soft">R {Number(item.price).toLocaleString()}</p>
+                                {problems[item.key] && (
+                                    <p className="field-error">
+                                        {problems[item.key].message}
+                                        {problems[item.key].fixable && (
+                                            <>
+                                                {" "}
+                                                <Link to={`/products/${item.id}`} className="underline underline-offset-4">
+                                                    on the product page
+                                                </Link>
+                                                , then remove this line.
+                                            </>
+                                        )}
+                                    </p>
+                                )}
                             </div>
 
                             <div className="flex items-center border border-mute">
@@ -85,7 +102,16 @@ export default function Cart() {
                         </span>
                     </div>
 
-                    <Button to="/checkout" className="w-full">Go to checkout</Button>
+                    {checkError && <p role="alert" className="field-error mb-4">{checkError}</p>}
+
+                    {hasProblems ? (
+                        <>
+                            <p role="alert" className="field-error mb-4">Fix the items marked above to continue.</p>
+                            <Button disabled className="w-full">Go to checkout</Button>
+                        </>
+                    ) : (
+                        <Button to="/checkout" className="w-full">Go to checkout</Button>
+                    )}
                 </aside>
             </div>
         </section>

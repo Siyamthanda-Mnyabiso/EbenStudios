@@ -1,9 +1,10 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import Button from "../components/ui/Button";
 import PageHeader from "../components/ui/PageHeader";
 
 export default function Profile() {
+    const location = useLocation();
     const { user, loading, logout } = useAuth();
 
     if (loading) {
@@ -11,7 +12,7 @@ export default function Profile() {
     }
 
     if (!user) {
-        return <Navigate to="/login" replace />;
+        return <Navigate to="/login" replace state={{ from: location.pathname }} />;
     }
 
     return (

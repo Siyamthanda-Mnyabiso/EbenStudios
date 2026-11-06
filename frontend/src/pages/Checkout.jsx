@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useCart } from "../hooks/useCart";
+import { useCartCheck } from "../hooks/useCartCheck";
 import { createOrder } from "../service/orderService";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
@@ -9,6 +10,7 @@ import PageHeader from "../components/ui/PageHeader";
 import { describeOptions } from "../lib/productOptions";
 
 export default function Checkout() {
+    const location = useLocation();
     const { user, loading: authLoading } = useAuth();
     const { items, subtotal, clearCart } = useCart();
     const navigate = useNavigate();
@@ -18,13 +20,14 @@ export default function Checkout() {
     const [postalCode, setPostalCode] = useState("");
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState("");
+    const { checking, problems, hasProblems, error: checkError } = useCartCheck();
 
     if (authLoading) {
         return null;
     }
 
     if (!user) {
-        return <Navigate to="/login" replace />;
+        return <Navigate to="/login" replace state={{ from: location.pathname }} />;
     }
 
     if (items.length === 0) {
@@ -53,8 +56,8 @@ export default function Checkout() {
                 shippingAddress: `${address}, ${city}, ${postalCode}`,
             });
 
-            clearCart();
             navigate("/orders", { state: { justOrderedId: order.id } });
+            clearCart();
         } catch (err) {
             setError(err.message || "Something went wrong. Please try again.");
         } finally {
@@ -71,6 +74,12 @@ export default function Checkout() {
                     <h2 className="title">Delivery address</h2>
 
                     {error && <p role="alert" className="field-error">{error}</p>}
+                    {checkError && <p role="alert" className="field-error">{checkError}</p>}
+                    {hasProblems && (
+                        <p role="alert" className="field-error">
+                            Some items in your order need attention. <Link to="/cart" className="underline underline-offset-4">Go back to your cart</Link> to fix them.
+                        </p>
+                    )}
 
                     <Input label="Street address" type="text" autoComplete="street-address" value={address} onChange={(e) => setAddress(e.target.value)} />
 
@@ -80,7 +89,7 @@ export default function Checkout() {
                     </div>
 
                     <div>
-                        <Button type="submit" disabled={submitting}>
+                        <Button type="submit" disabled={submitting || checking || hasProblems}>
                             {submitting ? "Placing order" : `Place order, R ${Number(subtotal).toLocaleString()}`}
                         </Button>
                     </div>
@@ -95,6 +104,7 @@ export default function Checkout() {
                                 <span className="text-ink-soft">
                                     {item.name} x {item.quantity}
                                     {describeOptions(item) && <span className="block text-sm">{describeOptions(item)}</span>}
+                                    {problems[item.key] && <span className="block text-sm field-error">{problems[item.key].message}</span>}
                                 </span>
                                 <span className="font-bold">R {Number(item.price * item.quantity).toLocaleString()}</span>
                             </li>
