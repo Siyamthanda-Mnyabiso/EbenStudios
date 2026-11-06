@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Plus, Pencil, Trash2, X, Upload, RotateCcw } from "lucide-react";
 import {
     getProducts,
@@ -10,6 +11,7 @@ import {
 import Input from "../../components/ui/Input";
 import { getProductImage } from "../../lib/productImage";
 import { CATEGORIES } from "../../lib/categories";
+import { prepareImage } from "../../lib/prepareImage";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
 
 const emptyForm = { name: "", description: "", price: "", stock: "", tag: "", category: "", sizes: "", colors: "" };
@@ -20,7 +22,9 @@ export default function Products() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    const [formOpen, setFormOpen] = useState(false);
+    // /admin/products?new=1 (the dashboard's Add product button) opens an empty form straight away.
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [formOpen, setFormOpen] = useState(() => searchParams.get("new") === "1");
     const [editingId, setEditingId] = useState(null);
     const [form, setForm] = useState(emptyForm);
     const [imageFile, setImageFile] = useState(null);
@@ -52,6 +56,13 @@ export default function Products() {
     useEffect(() => {
         loadProducts();
     }, []);
+
+    // Drop ?new=1 once the form is open, so a refresh or Back does not reopen it.
+    useEffect(() => {
+        if (searchParams.has("new")) {
+            setSearchParams({}, { replace: true });
+        }
+    }, [searchParams, setSearchParams]);
 
     async function loadProducts() {
         setLoading(true);
@@ -103,7 +114,8 @@ export default function Products() {
         setFormError("");
 
         try {
-            const payload = { ...form, image: imageFile };
+            // Large phone photos are shrunk and converted to JPEG before upload.
+            const payload = { ...form, image: imageFile ? await prepareImage(imageFile) : null };
 
             if (editingId) {
                 await updateProduct(editingId, payload);
@@ -206,9 +218,9 @@ export default function Products() {
                             {imageFile ? imageFile.name : "Upload image"}
                             <input
                                 type="file"
-                                accept="image/jpeg,image/png,image/webp,image/gif"
+                                accept="image/*"
                                 onChange={(e) => setImageFile(e.target.files?.[0] ?? null)}
-                                className="hidden"
+                                className="sr-only"
                             />
                         </label>
                     </div>

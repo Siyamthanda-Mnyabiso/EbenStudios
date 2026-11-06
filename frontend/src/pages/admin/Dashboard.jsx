@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { DollarSign, ShoppingBag, Users, Package } from "lucide-react";
+import { Link } from "react-router-dom";
+import { DollarSign, ShoppingBag, Users, Package, Plus } from "lucide-react";
 import { getProducts } from "../../service/productService";
 import { getOrders } from "../../service/orderService";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
@@ -33,9 +34,19 @@ export default function Dashboard() {
 
     return (
         <div>
-            <h1 className="headline mb-8">
-                Dashboard
-            </h1>
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+                <h1 className="headline">
+                    Dashboard
+                </h1>
+
+                <Link
+                    to="/admin/products?new=1"
+                    className="inline-flex items-center gap-2 min-h-12 bg-ember text-white px-5 font-bold hover:bg-ember-deep transition-colors"
+                >
+                    <Plus size={18} aria-hidden="true" />
+                    Add product
+                </Link>
+            </div>
 
             {error && (
                 <p className="field-error mb-4">{error}</p>

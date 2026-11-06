@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { ShoppingBag, User, Menu } from "lucide-react";
+import { ShoppingBag, User, Menu, LayoutDashboard } from "lucide-react";
 
 import MobileMenu from "./MobileMenu";
 import { useCart } from "../../hooks/useCart";
@@ -55,10 +55,23 @@ export default function Navbar() {
                     </Link>
 
                     <div className="flex items-center justify-end -mr-3">
+                        {user?.role === "ADMIN" && (
+                            <Link
+                                to="/admin"
+                                aria-label="Admin dashboard"
+                                // Desktop only: on phones the admin bar above the header does this job.
+                                className="hidden md:inline-flex items-center justify-center gap-2 min-h-10 px-4 mr-1 rounded-full bg-black text-white font-semibold text-sm hover:bg-neutral-700 transition-colors"
+                            >
+                                <LayoutDashboard size={18} aria-hidden="true" />
+                                Admin
+                            </Link>
+                        )}
+
                         <Link
                             to={user ? "/profile" : "/login"}
                             aria-label={user ? "Account" : "Log in"}
-                            className={`${iconButton} hidden md:inline-flex`}
+                            // Account sits in the mobile menu, so this icon is desktop only.
+                            className={`${iconButton.replace("inline-flex", "hidden md:inline-flex")}`}
                         >
                             <User size={22} />
                         </Link>
