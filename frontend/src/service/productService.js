@@ -14,6 +14,11 @@ export async function getProducts({ includeArchived = false } = {}) {
 }
 
 export async function getProduct(id) {
+    // Ids are whole numbers; anything else (e.g. /products/abc) is simply not found.
+    if (!/^\d+$/.test(String(id))) {
+        throw new Error("Product not found.");
+    }
+
     const row = unwrap(await supabase.from("products").select("*").eq("id", id).maybeSingle());
 
     if (!row) {
@@ -44,13 +49,14 @@ async function deleteImage(imageUrl) {
     await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove([path]);
 }
 
-function toRow({ name, description, price, stock, tag, sizes, colors }) {
+function toRow({ name, description, price, stock, tag, category, sizes, colors }) {
     return {
         name,
         description: description || null,
         price: Number(price),
         stock: Number(stock ?? 0),
         tag: tag || null,
+        category: category || null,
         sizes: parseList(sizes),
         colors: parseList(colors),
     };

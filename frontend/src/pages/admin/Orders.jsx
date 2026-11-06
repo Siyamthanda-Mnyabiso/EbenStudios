@@ -3,6 +3,7 @@ import { ChevronDown } from "lucide-react";
 import { getOrders, updateOrderStatus } from "../../service/orderService";
 import { getProductImage } from "../../lib/productImage";
 import { describeOptions } from "../../lib/productOptions";
+import { useDocumentTitle } from "../../hooks/useDocumentTitle";
 
 const ORDER_STATUSES = ["Pending", "Paid", "Shipped", "Delivered", "Cancelled"];
 const ROW_GRID = "md:grid-cols-[6rem_7rem_minmax(0,1fr)_7rem_10rem_8rem]";
@@ -84,6 +85,7 @@ function OrderDetails({ order }) {
 }
 
 export default function Orders() {
+    useDocumentTitle("Admin orders");
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");

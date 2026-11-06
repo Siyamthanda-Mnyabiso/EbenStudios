@@ -1,13 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
 import Reveal from "../ui/Reveal";
-
-const categories = [
-    { name: "Hoodies", description: "Heavyweight fleece built for the streets" },
-    { name: "T-shirts", description: "Everyday essentials in a boxy fit" },
-    { name: "Outerwear", description: "Jackets made for Cape Town winters" },
-    { name: "Accessories", description: "Caps, bags and the finer details" },
-];
+import { CATEGORIES as categories, categoryLink } from "../../lib/categories";
 
 export default function Categories() {
     return (
@@ -20,7 +14,7 @@ export default function Categories() {
                 {categories.map((category, index) => (
                     <Reveal as="li" key={category.name} delay={index * 80} className="border-b border-line">
                         <Link
-                            to="/shop"
+                            to={categoryLink(category)}
                             className="group grid grid-cols-[2.5rem_1fr_auto] items-center gap-4 py-6 hover:bg-white transition-colors"
                         >
                             <span className="text-mute font-bold">{String(index + 1).padStart(2, "0")}</span>

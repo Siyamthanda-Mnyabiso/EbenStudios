@@ -1,8 +1,10 @@
 import heroImage from "../assets/hero_img.png";
 import Button from "../components/ui/Button";
 import PageHeader from "../components/ui/PageHeader";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
 export default function About() {
+    useDocumentTitle("About");
     return (
         <section className="page page-section">
             <PageHeader eyebrow="Our story" title="About Eben Studios" />

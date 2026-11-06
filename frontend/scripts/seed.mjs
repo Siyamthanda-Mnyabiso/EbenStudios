@@ -38,12 +38,38 @@ async function ensureAdmin() {
 }
 
 async function seedProducts() {
-    // Placeholders based on the items visible on the brand's Instagram. Replace in the admin.
-    const description = "Placeholder product. Replace the name, price and photo in the admin.";
+    // The launch collection. Photos are uploaded in the admin.
     const products = [
-        { name: "White tee", description, price: 549, stock: 10, tag: "Placeholder", sizes: ["S", "M", "L", "XL"], colors: ["White", "Black"] },
-        { name: "Red shorts", description, price: 799, stock: 10, tag: "Placeholder", sizes: ["S", "M", "L", "XL"], colors: ["Red"] },
-        { name: "Cap", description, price: 399, stock: 10, tag: "Placeholder", sizes: [], colors: ["Red"] },
+        {
+            name: "White tee",
+            description: "An oversized white tee in a boxy fit with dropped shoulders, finished with a small embroidered Eben Studios logo on the chest. Also available in black.",
+            price: 549,
+            stock: 10,
+            tag: "New",
+            category: "T-shirts",
+            sizes: ["S", "M", "L", "XL"],
+            colors: ["White", "Black"],
+        },
+        {
+            name: "Red shorts",
+            description: "Lightweight red shorts with an elastic waist and the Eben Supply script logo on the leg. Made for warm Cape Town days and easy layering with a white tee.",
+            price: 799,
+            stock: 10,
+            tag: null,
+            category: "Bottoms",
+            sizes: ["S", "M", "L", "XL"],
+            colors: ["Red"],
+        },
+        {
+            name: "Cap",
+            description: "A red cap with a soft crown and a short curved brim. The finishing touch on any Eben Studios fit.",
+            price: 399,
+            stock: 10,
+            tag: null,
+            category: "Accessories",
+            sizes: [],
+            colors: ["Red"],
+        },
     ];
 
     const { error } = await supabase.from("products").upsert(products, { onConflict: "name", ignoreDuplicates: true });

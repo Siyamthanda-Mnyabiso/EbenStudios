@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { DollarSign, ShoppingBag, Users, Package } from "lucide-react";
 import { getProducts } from "../../service/productService";
 import { getOrders } from "../../service/orderService";
+import { useDocumentTitle } from "../../hooks/useDocumentTitle";
 
 export default function Dashboard() {
+    useDocumentTitle("Admin dashboard");
     const [products, setProducts] = useState([]);
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);

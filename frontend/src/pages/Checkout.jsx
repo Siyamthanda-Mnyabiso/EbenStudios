@@ -8,8 +8,10 @@ import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 import PageHeader from "../components/ui/PageHeader";
 import { describeOptions } from "../lib/productOptions";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
 export default function Checkout() {
+    useDocumentTitle("Checkout");
     const location = useLocation();
     const { user, loading: authLoading } = useAuth();
     const { items, subtotal, clearCart } = useCart();

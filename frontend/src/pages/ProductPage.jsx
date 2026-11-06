@@ -7,9 +7,15 @@ import { getProductImage } from "../lib/productImage";
 import Button from "../components/ui/Button";
 import OptionGroup from "../components/products/OptionGroup";
 import { defaultSelection } from "../lib/productOptions";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
+// Keyed by id so moving from one product to another starts with fresh state.
 export default function ProductPage() {
     const { id } = useParams();
+    return <ProductView key={id} id={id} />;
+}
+
+function ProductView({ id }) {
     const { addToCart } = useCart();
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -41,9 +47,15 @@ export default function ProductPage() {
         setTimeout(() => setAdded(false), 2000);
     }
 
+    useDocumentTitle(product ? product.name : error ? "Product not found" : "Product");
+
     useEffect(() => {
+        // A slow earlier load is ignored if the page has moved on.
+        let ignore = false;
+
         getProduct(id)
             .then((data) => {
+                if (ignore) return;
                 setProduct(data);
                 // Single option products need no choosing.
                 const preset = defaultSelection(data);
@@ -52,8 +64,16 @@ export default function ProductPage() {
                 setErrors({});
                 setError("");
             })
-            .catch((err) => setError(err.message || "Product not found."))
-            .finally(() => setLoading(false));
+            .catch((err) => {
+                if (!ignore) setError(err.message || "Product not found.");
+            })
+            .finally(() => {
+                if (!ignore) setLoading(false);
+            });
+
+        return () => {
+            ignore = true;
+        };
     }, [id]);
 
     if (loading) {

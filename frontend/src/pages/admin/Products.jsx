@@ -9,10 +9,13 @@ import {
 } from "../../service/productService";
 import Input from "../../components/ui/Input";
 import { getProductImage } from "../../lib/productImage";
+import { CATEGORIES } from "../../lib/categories";
+import { useDocumentTitle } from "../../hooks/useDocumentTitle";
 
-const emptyForm = { name: "", description: "", price: "", stock: "", tag: "", sizes: "", colors: "" };
+const emptyForm = { name: "", description: "", price: "", stock: "", tag: "", category: "", sizes: "", colors: "" };
 
 export default function Products() {
+    useDocumentTitle("Admin products");
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -80,6 +83,7 @@ export default function Products() {
             price: product.price,
             stock: product.stock,
             tag: product.tag || "",
+            category: product.category || "",
             sizes: product.sizes.join(", "),
             colors: product.colors.join(", "),
         });
@@ -212,6 +216,23 @@ export default function Products() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                         <Input label="Name" type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
                         <Input label="Tag" optional placeholder="For example New or Limited" type="text" value={form.tag} onChange={(e) => setForm({ ...form, tag: e.target.value })} />
+                        <div>
+                            <label htmlFor="product-category" className="field-label">
+                                Category <span className="font-normal text-mute">(optional)</span>
+                            </label>
+                            <select
+                                id="product-category"
+                                value={form.category}
+                                onChange={(e) => setForm({ ...form, category: e.target.value })}
+                                className="field"
+                            >
+                                <option value="">No category</option>
+                                {CATEGORIES.map((category) => (
+                                    <option key={category.slug} value={category.name}>{category.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="hidden sm:block" aria-hidden="true" />
                         <Input label="Price (R)" type="number" min="0" step="0.01" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
                         <Input label="Stock" type="number" min="0" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} />
 
@@ -304,6 +325,7 @@ export default function Products() {
                                 </td>
                                 <td className="px-6 py-4">
                                     <p className="font-semibold">{product.name}</p>
+                                    {product.category && <p className="text-sm text-mute">{product.category}</p>}
                                     {(product.sizes.length > 0 || product.colors.length > 0) && (
                                         <p className="text-sm text-mute">
                                             {[product.sizes.length > 0 && `Sizes ${product.sizes.join(", ")}`, product.colors.length > 0 && `Colours ${product.colors.join(", ")}`].filter(Boolean).join(". ")}
