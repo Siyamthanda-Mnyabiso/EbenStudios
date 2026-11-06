@@ -89,6 +89,7 @@ export default function Orders() {
     const [error, setError] = useState("");
     const [updatingId, setUpdatingId] = useState(null);
     const [openId, setOpenId] = useState(null);
+    const [notice, setNotice] = useState("");
 
     useEffect(() => {
         getOrders()
@@ -98,12 +99,24 @@ export default function Orders() {
     }, []);
 
     async function handleStatusChange(orderId, status) {
+        const previous = orders.find((order) => order.id === orderId)?.status;
         setUpdatingId(orderId);
         setError("");
+        setNotice("");
 
         try {
             const updated = await updateOrderStatus(orderId, status);
             setOrders((current) => current.map((order) => (order.id === orderId ? updated : order)));
+
+            // The database moves stock when an order is cancelled or reopened.
+            const units = updated.items.reduce((sum, item) => sum + item.quantity, 0);
+            const itemsText = `${units} item${units === 1 ? "" : "s"}`;
+
+            if (status === "Cancelled") {
+                setNotice(`Order #EB-${orderId} cancelled. ${itemsText} returned to stock.`);
+            } else if (previous === "Cancelled") {
+                setNotice(`Order #EB-${orderId} reopened. ${itemsText} taken from stock again.`);
+            }
         } catch (err) {
             setError(err.message || "Failed to update order status.");
         } finally {
@@ -119,6 +132,10 @@ export default function Orders() {
 
             {error && (
                 <p role="alert" className="field-error mb-4">{error}</p>
+            )}
+
+            {notice && (
+                <p role="status" className="border-l-4 border-ember bg-paper-deep px-6 py-4 mb-4 font-medium">{notice}</p>
             )}
 
             <div className="bg-white border border-line">
